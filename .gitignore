@@ -1,0 +1,5 @@
+.DS_Store
+[1-6].pdf
+*.aux
+*.dvi
+*.log
