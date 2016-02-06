@@ -1,5 +1,14 @@
+# macs are annoying sometimes
 .DS_Store
+
+# latex output
+
 [1-6].pdf
 *.aux
 *.dvi
 *.log
+
+# ocaml output
+*.cmo
+*.cmi
+*.output
