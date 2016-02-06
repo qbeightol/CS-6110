@@ -9,12 +9,12 @@ open Ast
    not containing any *)
 let rec translate (e : expr_s) : expr =
   match e with
-  | Var_s(x) -> failwith "Implement me!" 
-  | Fun_s([], e) -> failwith "translate: Empty parameter list"
-  | Fun_s([x], e) -> failwith "Implement me!" 
-  | Fun_s(h::t, e) -> failwith "Implement me!" 
-  | Let_s(x, e1, e2) -> failwith "Implement me!" 
-  | App_s(e1, e2) -> failwith "Implement me!"
+  | Var_s x               -> Var x
+  | Fun_s ([], e_s)       -> failwith "translate: Empty parameter list"
+  | Fun_s ([x], e_s)      -> Fun (x, translate e_s)
+  | Fun_s (h::t, e_s)     -> Fun (h, translate (Fun_s (t, e_s)))
+  | Let_s (x, e1_s, e2_s) -> App (Fun (x, translate e2_s), translate e1_s)
+  | App_s (e1_s, e2_s)    -> App (translate e1_s, translate e2_s)
 
 (* is_value determines whether the given expression is a value. A value    *)
 (* is a fully evaluated expression.                                        *)
@@ -31,8 +31,8 @@ let is_closed (e : expr) : bool = HashSet.size (fv e) = 0
 let rec subst (e : expr) (v : expr) (x : id) : expr =
   match e with
   | Var y -> failwith "Implement me!"
-  | Fun (y, e1) -> failwith "Implement me!" 
-  | App (e1, e2) -> failwith "Implement me!" 
+  | Fun (y, e1) -> failwith "Implement me!"
+  | App (e1, e2) -> failwith "Implement me!"
 
 (* cbv_step e is the result with one rewrite step applied to e *)
 let rec cbv_step (e : expr) : expr =
@@ -40,7 +40,7 @@ let rec cbv_step (e : expr) : expr =
   | Var x -> failwith ("Unbound variable " ^ x)
   | Fun _ -> failwith ("Already reduced")
   | App (Fun (x, e1), (Fun _ as e2)) -> failwith "Implement me!"
-  | App (Fun (x, e1), e2) -> failwith "Implement me!" 
+  | App (Fun (x, e1), e2) -> failwith "Implement me!"
   | App (e1, e2) -> failwith "Implement me!"
 
 (* Some examples to play with                     *)
