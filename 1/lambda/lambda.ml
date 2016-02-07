@@ -30,18 +30,20 @@ let is_closed (e : expr) : bool = HashSet.size (fv e) = 0
 (* substitute v for x in e, avoiding capture *)
 let rec subst (e : expr) (v : expr) (x : id) : expr =
   match e with
-  | Var y -> failwith "Implement me!"
-  | Fun (y, e1) -> failwith "Implement me!"
-  | App (e1, e2) -> failwith "Implement me!"
+  | Var y when y = x          -> v
+  | Var y   (* y ≠ x *)       -> e
+  | Fun (y, e1) when y = x    -> e
+  | Fun (y, e2)   (* y ≠ x *) -> Fun (y, subst e2 v x)
+  | App (e1, e2)              -> App (subst e1 v x, subst e2 v x)
 
 (* cbv_step e is the result with one rewrite step applied to e *)
 let rec cbv_step (e : expr) : expr =
   match e with
   | Var x -> failwith ("Unbound variable " ^ x)
   | Fun _ -> failwith ("Already reduced")
-  | App (Fun (x, e1), (Fun _ as e2)) -> failwith "Implement me!"
-  | App (Fun (x, e1), e2) -> failwith "Implement me!"
-  | App (e1, e2) -> failwith "Implement me!"
+  | App (Fun (x, e1), (Fun _ as e2)) -> subst e1 e2 x
+  | App (Fun (x, e1), e2) -> App (Fun (x, e1), cbv_step e2)
+  | App (e1, e2) -> App (cbv_step e1, e2)
 
 (* Some examples to play with                     *)
 (*
