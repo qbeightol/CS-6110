@@ -1,4 +1,4 @@
 Division of Labor
 =================
-Giang: 4, 2, 5
+Giang: 2, 4, 5
 Quinn: 6, 1, 3
