@@ -72,7 +72,7 @@ It is easy to see that these normal forms are different as the first one is the 
 
 Since there are 2 side conditions we will consider 2 different examples.
 \begin{enumerate}
-\item Let $e_0 = z$ and $e = y$ so that $z \in FV(e_0)$. The expression is $(\lambda y . z) \{ y / x \}$. 
+\item Let $e_0 = z$ and $e = y$ so that $z \in FV(e_0)$. The expression is $(\lambda y . z) \{ y / x \}$.
 
 Without the condition:
 
@@ -83,7 +83,7 @@ Under safe substitution instead of $z$ we use variable $t$ so that $t \notin FV(
 $(\lambda y. z) \{ y / x\}) = \lambda t . (z \{t / y\} \{y / x\}) = \lambda t . z$
 
 Again these normal forms are obviously different.
-\item Let $e = z \text{ } y$ and $e_0 = x$ so that $z \in FV(e)$. The expression is $(\lambda y . x) \{ z \text{ } y / x \}$. 
+\item Let $e = z \text{ } y$ and $e_0 = x$ so that $z \in FV(e)$. The expression is $(\lambda y . x) \{ z \text{ } y / x \}$.
 
 Without the condition:
 
@@ -100,10 +100,14 @@ Again these normal forms are obviously different.
 \subsection*{\sf 3 Small-Step Operational Semantics}
 \begin{mathpar}
 \Rule{Beta}{}{(\lambda x . e_0)~e_1 \steps e_0 \{ e_1 / x\}}
+
+\Rule{MOAR POWAH}{e \steps e'}{\lambda x. e \steps \lambda x. e'}
+
 \Rule{Step Left}{e_1 \steps e'_1}{e_1~e_2 \steps e'_1~e_2}
-\Rule{Step Right}{e_2 \steps e'_2}{e_1~e_2 \steps e_1~e'_2} 
+
+\Rule{Step Right}{e_2 \steps e'_2}{e_1~e_2 \steps e_1~e'_2}
 \end{mathpar}
-	
+
 \subsection*{\sf 4 $\lambda$-Calculus Encodings}
 \begin{enumerate}[(a)]
 \item \verb succ $\text{ } \triangleq \lambda \widehat n f x . \text{ } f \text{ } \widehat n \text{ } (\widehat n \text{ } f \text{ } x)$
