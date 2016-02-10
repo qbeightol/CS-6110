@@ -1,13 +1,16 @@
 \documentclass[10pt]{article}
 \usepackage{fancyhdr, geometry, tikz}
 \usepackage{mathpartir}
-\usetikzlibrary{positioning}
- \usepackage{amssymb, amsmath}
+%\usetikzlibrary{positioning}
+\usepackage{amssymb, amsmath}
 \usepackage{enumerate, verbatim}
 \pagestyle{fancy}
 
 \lhead{\sf CS 6110 Homework 1}
 \rhead{\sf Giang Nguyen (htn26) and Quinn Beightol (qeb2)}
+
+\newcommand{\steps}{\longrightarrow}
+\newcommand{\apply}{\lambda x. \lambda y. x~y}
 
 \newcommand{\Rule}[3]{
   [\textsc{#1}]~
@@ -16,10 +19,11 @@
   \ensuremath{\inferrule{#2}{#3}}
   \hfill
 }
-\newcommand{\steps}{\longrightarrow}
+
 
 \begin{document}
 \subsection*{\sf 1 Free and Bound Variables}
+%\begin{graveyard}
   % $$
   % % \lambda a. \left (
   % %   \lambda b. \left (
@@ -30,26 +34,41 @@
   % % \right )
   % \left ( (a~a)~(\lambda b. b) \right )
   % $$
-
-  \begin{center} \begin{tikzpicture}[node distance=0.5cm]
-    \node (absA) {$\lambda a.$};
-    \node (absB1) [right=of absA] {$\lambda b.$};
-    \node (absC) [right=of absB1] {$\lambda c.$};
-    \node[rectangle, draw] (a1)    [right=of absC] {$a$};
-    \node[rectangle, draw] (a2)   [right=of a1] {$a$};
-    \node (absB2) [right=of a2] {$\lambda b.$};
-    \node[rectangle, draw] (b1) [right=of absB2] {$b$};
-    \node[rectangle, draw] (b2) [right= of b1] {$b$};
-    \node[rectangle, draw] (c1) [right=of b2]{$c$};
-    \node[rectangle, draw] (c2) [right=of c1]{$c$};
-    \path[->]
-      (a1) edge [bend right]  node {} (absA)
-      (a2) edge [bend right]  node {} (absA)
-      (b1) edge              node {} (absB2)
-      (b2) edge [bend left] node {} (absB1)
-      (c1) edge [bend right] node {} (absC)
-      (c2) edge [bend right] node {} (absC);
-  \end{tikzpicture} \end{center}
+  % \begin{center} \begin{tikzpicture}[node distance=0.5cm]
+  %   \node (absA) {$\lambda a.$};
+  %   \node (absB1) [right=of absA] {$\lambda b.$};
+  %   \node (absC) [right=of absB1] {$\lambda c.$};
+  %   \node[rectangle, draw] (a1)    [right=of absC] {$a$};
+  %   \node[rectangle, draw] (a2)   [right=of a1] {$a$};
+  %   \node (absB2) [right=of a2] {$\lambda b.$};
+  %   \node[rectangle, draw] (b1) [right=of absB2] {$b$};
+  %   \node[rectangle, draw] (b2) [right= of b1] {$b$};
+  %   \node[rectangle, draw] (c1) [right=of b2]{$c$};
+  %   \node[rectangle, draw] (c2) [right=of c1]{$c$};
+  %   \path[->]
+  %     (a1) edge [bend right]  node {} (absA)
+  %     (a2) edge [bend right]  node {} (absA)
+  %     (b1) edge              node {} (absB2)
+  %     (b2) edge [bend left] node {} (absB1)
+  %     (c1) edge [bend right] node {} (absC)
+  %     (c2) edge [bend right] node {} (absC);
+  % \end{tikzpicture} \end{center}
+%\end{graveyard}
+\begin{enumerate}
+  \item \begin{enumerate}
+    \item
+    \item
+    \item
+  \end{enumerate}
+  \item \begin{eqnarray*}
+    %(\apply) \left(\left(\lambda x. \lambda z. x~z\right) (\lambda y. y)~\right{)} & \steps & b
+    &        & (\apply) ~ \underline{((\lambda x. \lambda z. x~z) ~ (\lambda y. y))} \\
+    & \steps & (\apply) ~ \lambda z. \underline{(\lambda y.y) ~ z} \\
+    & \steps & \underline{(\apply)~\lambda z. z} \\
+    & \steps & \lambda y. \underline{(\lambda z. z)~y} \\
+    & \steps & \lambda y. y
+  \end{eqnarray*}
+\end{enumerate}
 \subsection*{\sf 2 Safe Substitution}
 
 We find counter-examples for the following rules with side conditions.
