@@ -103,15 +103,15 @@ Under safe substitution instead of $z$ we use variable $t$ so that $t \notin FV(
 $(\lambda y. z) \{ y / x\}) = \lambda t . (z \{t / y\} \{y / x\}) = \lambda t . z$
 
 Again these normal forms are obviously different.
-\item Let $e = z \text{ } y$ and $e_0 = x$ so that $z \in FV(e)$. The expression is $(\lambda y . x) \{ z \text{ } y / x \}$.
+\item Let $e = z \text{ } y$ and $e_0 = x$ so that $z \in FV(e)$. The expression is $(\lambda y . x) \{ z ~ y / x \}$.
 
 Without the condition:
 
-$(\lambda y . x) \{ z \text{ } y / x \}= \lambda z . (x \{z / y\} \{z \text{ } y / x \}) = \lambda z. z \text{ } y$
+$(\lambda y . x) \{ z ~ y / x \}= \lambda z . (x \{z / y\} \{z ~ y / x \}) = \lambda z. z ~ y$
 
 Under safe substitution again instead of $z$ we use variable $t$ so that $t \notin FV(e_0)$ and $t \notin FV(e)$
 
-$(\lambda y.  x) \{ z \text{ } y / x\}) = \lambda t . (x \{t / y\} \{z \text{ } y / x\}) = \lambda t . z \text{ } y$
+$(\lambda y.  x) \{ z ~ y / x\}) = \lambda t . (x \{t / y\} \{z~y / x\}) = \lambda t . z~ y$
 
 Again these normal forms are obviously different.
 \end{enumerate}
@@ -130,31 +130,33 @@ Again these normal forms are obviously different.
 
 \subsection*{\sf 4 $\lambda$-Calculus Encodings}
 \begin{enumerate}[(a)]
-\item \verb succ $\text{ } \triangleq \lambda \widehat n f x . \text{ } f \text{ } \widehat n \text{ } (\widehat n \text{ } f \text{ } x)$
+\item \verb succ $ ~\triangleq \lambda \widehat n f x .f ~ \widehat n~ (\widehat n ~ f ~ x)$
 
-\item \verb pred $ \text{ } \triangleq \lambda \widehat n . \text{ } \widehat{n} \text{ } (\lambda x y.\text{ } x) \text{ } \widehat{0}$
+\item \verb pred $~ \triangleq \lambda \widehat n .\widehat{n} ~  (\lambda x y.~ x) ~ \widehat{0}$
 
-\item \verb iszero $\text{ } \triangleq \lambda \widehat n . \text{ } \widehat{n} \text{ } (\lambda a b. \text{ } \verb false) \text{ } \verb true .$
+\item \verb iszero $~\triangleq \lambda \widehat n .\widehat{n} ~ (\lambda a b.\verb false) ~\verb true .$
 
-\item \verb add $\text{ } \triangleq \lambda \widehat n \widehat{m}. \text{ } \widehat{n} \text{ } (\lambda a b. \text{ } \verb succ \text{ } b) \text{ } \widehat{m}.$
+\item \verb add $~\triangleq \lambda \widehat n \widehat{m}.\widehat{n} ~ (\lambda a b. ~\verb succ ~b) ~\widehat{m}.$
 
-\verb sum $\text{ } \triangleq \lambda \widehat n . \text{ } \widehat{n} \text{ } \verb add \text{ } \widehat{0}$
+\verb sum $~ \triangleq \lambda \widehat n .\widehat{n}~\verb add ~ \widehat{0}$
 
 \item \textbf{Karma problem: }
+
+Given a function $f$ and an input $x$ the Church encoding $\widehat{n}$ applies $f$ on $x$ $n$ times. The intuition for the predecessor function is to apply a function
+
+$f' = \lambda (a,\_).(f~a, a) = \lambda p. p ~ (\lambda y~z. \verb pair ~ (f~y)~ y)$ 
+
+on input $(x,x)$ $n$ times. The output argument will be $(f^n~ x, f^{n-1} ~x)$. Thus the \verb pred  function can be given as follow:
+
+\verb pred $~\triangleq \lambda \widehat{n} f x. \verb second ~ (\widehat{n} ~ (\lambda p.p ~ (\lambda y~z. \verb pair ~ (f~y)~ y))) ~(\verb pair ~ x ~x))$
 \end{enumerate}
 
 \subsection*{\sf 5 $\lambda$-Calculus Programming}
-Let \verb pair  be the usual pairs function that takes 2 inputs and form a pair. Let \verb p1 and \verb p2 be the usual projection operator that produces the first and second element respectively of a pair.
-
-\verb pair $\text{ } x \text{ } y = (x,y)$
-
-\verb p1 $\text{ } (x,y) = x$
-
- \verb p2 $\text{ } (x,y) = y$
+Let \verb pair  be the usual pairing function that takes 2 inputs and form a pair. Let \verb first  and \verb second  be the usual projection operator that produces the first and second element respectively of a pair.
 \begin{enumerate}[(a)]
-\item \verb curry $\text{ } \triangleq \lambda f x y. \text{ } f \text{ } (\verb pair \text{ } x \text{ } y)$
+\item \verb curry $~\triangleq \lambda f x y.f ~(\verb pair ~x~y)$
 
-\item \verb uncurry $\text{ } \triangleq \lambda f z. \text{ } f \text{ } (\verb p1 \text{ } z) \text{ } (\verb p2 \text{ } z)$
+\item \verb uncurry $~\triangleq \lambda f z. f~(\verb first ~z)~(\verb second ~z)$
 \end{enumerate}
 \subsection*{\sf 6 Implementing the $\lambda$-Calculus}
 \subsection*{\sf 7 Debriefing}
