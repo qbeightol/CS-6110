@@ -16,9 +16,9 @@
 \newcommand{\Rule}[3]{
   [\textsc{#1}]~
   \label{rule:#1}
-  \hfill
+  % \hfill
   \ensuremath{\inferrule{#2}{#3}}
-  \hfill
+  % \hfill
 }
 
 
@@ -57,9 +57,9 @@
 %\end{graveyard}
 \begin{enumerate}
   \item \begin{enumerate}
-    \item \includegraphics[scale=0.5]{i}
-    \item \includegraphics[scale=0.5]{ii}
-    \item \includegraphics[scale=0.5]{iii}
+    \item \text{ } \\ \includegraphics[scale=0.5]{i}
+    \item \text{ } \\ \includegraphics[scale=0.5]{ii}
+    \item \text{ } \\ \includegraphics[scale=0.5]{iii}
   \end{enumerate}
   \item \begin{eqnarray*}
     %(\apply) \left(\left(\lambda x. \lambda z. x~z\right) (\lambda y. y)~\right{)} & \steps & b
@@ -121,7 +121,7 @@ Again these normal forms are obviously different.
 \begin{mathpar}
 \Rule{Beta}{}{(\lambda x . e_0)~e_1 \steps e_0 \{ e_1 / x\}}
 
-\Rule{MOAR POWAH}{e \steps e'}{\lambda x. e \steps \lambda x. e'}
+\Rule{Step Body}{e \steps e'}{\lambda x. e \steps \lambda x. e'} \\
 
 \Rule{Step Left}{e_1 \steps e'_1}{e_1~e_2 \steps e'_1~e_2}
 
