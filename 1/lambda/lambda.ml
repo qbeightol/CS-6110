@@ -28,12 +28,15 @@ let is_value (e : expr) : bool =
 let is_closed (e : expr) : bool = HashSet.size (fv e) = 0
 
 (* substitute v for x in e, avoiding capture *)
-let rec subst (e : expr) (v : expr) (x : id) : expr =
-  match e with
-  | Var y when y = x          -> v
-  | Var y   (* y ≠ x *)       -> e
-  | Fun (y, e1) when y = x    -> e
-  | Fun (y, e2)   (* y ≠ x *) -> Fun (y, subst e2 v x)
+let rec subst e v x = match e with
+  | Var y when y = x    -> v
+  | Var _   (* e ≠ x *) -> e
+  | Fun (y, _) when y = x -> e
+  | Fun (y, e0) when not @@ HashSet.mem (fv v) y -> Fun (y, subst e0 v x)
+  | Fun (y, e0) ->
+    let expr_of_unsafe_ids = App (App (e0, v), App (Var x, Var y)) in
+    let z = fresh expr_of_unsafe_ids in
+    Fun (z, subst (subst e (Var z) y) e x)
   | App (e1, e2)              -> App (subst e1 v x, subst e2 v x)
 
 (* cbv_step e is the result with one rewrite step applied to e *)
@@ -58,4 +61,20 @@ let two = succ one in
 let plus = fun n1 n2 -> n1 succ n2 in
 let four = (plus two) two in
 (plus four) four
+*)
+
+(* other tests
+let t = fun x y -> x in
+let f = fun x y -> y in
+let cond = fun b e1 e2 -> b e1 e2 in
+cond t (fun a -> a) (fun b -> b)
+
+let pair = fun a b proj -> proj a b in
+let fst = fun pair -> pair (fun a b -> a) in
+let snd = fun pair -> pair (fun a b -> b) in
+let xy = pair (fun x -> x) (fun y -> y) in
+fst (pair (snd xy) (fst xy))
+
+(fun x y -> x) (fun a -> y)
+
 *)

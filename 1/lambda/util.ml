@@ -5,7 +5,6 @@ let option_map (f : 'a -> 'b) (x : 'a option) : 'b option =
   match x with
   | Some a -> Some (f a)
   | None -> None
-  
 (*****************************************************
  * HashSet -- like in Java
  *****************************************************)
@@ -41,15 +40,15 @@ module type LexStream = sig
 end
 
 module LexStream : LexStream = struct
-  type t = int list ref 
-  
+  type t = int list ref
+
   let rec inc (s : int list) : int list =
     match s with
       | [] -> [Char.code 'a']
       | x :: t ->
           if x < Char.code 'z' then (x + 1) :: t
           else Char.code 'a' :: inc t
-        
+
   let make() : t = ref [Char.code 'a']
 
   let next (h : t) : string =
@@ -57,4 +56,3 @@ module LexStream : LexStream = struct
     h := inc l;
     String.concat "" (List.map (String.make 1) (List.map Char.chr (List.rev l)))
 end
-  
