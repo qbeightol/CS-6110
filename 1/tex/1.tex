@@ -146,9 +146,10 @@ Given a function $f$ and an input $x$ the Church encoding $\widehat{n}$ applies 
 
 $f' = \lambda (a,\_).(f~a, a) = \lambda p. p ~ (\lambda y~z. \verb pair ~ (f~y)~ y)$ 
 
-on input $(x,x)$ $n$ times. The output argument will be $(f^n~ x, f^{n-1} ~x)$. Thus the \verb pred  function can be given as follow:
+on input $(x, x)$ $n$ times. The output argument will be $(f^n~ x, f^{n-1} ~x)$. Thus the \verb pred  function can be given as follow:
 
 \verb pred $~\triangleq \lambda \widehat{n} f x. \verb second ~ (\widehat{n} ~ (\lambda p.p ~ (\lambda y~z. \verb pair ~ (f~y)~ y))) ~(\verb pair ~ x ~x))$
+
 \end{enumerate}
 
 \subsection*{\sf 5 $\lambda$-Calculus Programming}
