@@ -2,11 +2,12 @@
 .DS_Store
 
 # latex output
-
 [1-6].pdf
 *.aux
 *.dvi
 *.log
+*.fdb_latexmk
+*.fls
 
 # ocaml output
 *.cmo
