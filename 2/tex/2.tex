@@ -1,6 +1,10 @@
 \documentclass[10pt]{article}
+\usepackage{amssymb}
+% \usepackage{amsmath}
+\usepackage{enumerate}
 \usepackage{fancyhdr}
 \usepackage{geometry}
+\usepackage{stmaryrd}
 
 \pagestyle{fancy}
 
@@ -10,7 +14,50 @@
 
 % Commands %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newcommand{\problem}[1]{\subsection*{\sf #1}}
+\newcommand{\translate}[2]{\ensuremath {\llbracket #1 \rrbracket}_{#2}}
+\newcommand{\defined}{\triangleq}
+\renewcommand{\S}{\textsf{S}}
+\newcommand{\K}{\textsf{K}}
+\newcommand{\I}{\textsf{I}}
+
 
 \begin{document}
-\problem{1 Observational Equivalence}
+\problem{1 Observational Equivalence} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\problem{2 Set Operators and Fixed Points} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\problem{3 Combinators} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{enumerate}[(a)]
+  \item
+  \item
+  \item
+  \item
+  \item
+
+  % NOTE: this translation doesn't work. Try translating something with a
+  % top-level application (ex: Ω). But it might have some salvageable ideas.
+
+  Use $\translate{e}{V}$ to translate a lambda term $e$ in a context
+  where the list of variables $V$ are in scope. The order of variables indicate
+  when the variable was introduced. E.g. the variables for translating $e$ in
+  $\lambda x. \lambda y. e$ would be $V = x, y$)
+
+  \begin{eqnarray*}
+    \translate{x}{x, V}         & \defined & \I                  \\
+    \translate{x}{y, V}         & \defined & \K~\translate{x}{V} \\
+    \translate{\lambda x. e}{V} & \defined & \translate{e}{V,x}  \\
+    \translate{e_1~e_2}{V}      & \defined & \S~\translate{e_1}{V}~\translate{e_2}{V}
+  \end{eqnarray*}
+
+  To translate closed $\lambda$-terms, use the empty context (denoted $\cdot$).
+
+\end{enumerate}
+\problem{4 For Loops} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\problem{5 Implementing IMP} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\problem{6 Debriefing} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{enumerate}[(a)]
+  \item
+  \item
+  \item
+  \item
+  \item
+\end{enumerate}
 \end{document}
