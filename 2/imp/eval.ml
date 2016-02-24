@@ -35,5 +35,9 @@ let rec eval_c (c : com) (s : state) : state =
   | Cond (b, ct, cf) -> if eval_b b s then eval_c ct s else eval_c cf s
   | Comp (c1, c2)    -> eval_c c1 s |> fun s' -> eval_c c2 s'
   | Assg (x, a)      -> rebind s x (eval_a a s)
-  | Print a          -> print_int (eval_a a s); s
+  | Print a          -> print_int (eval_a a s); print_new_line; s
   | Skip             -> s
+  | For (a, c)       ->
+    let n =  eval_a a s in
+    if n <= 0 then s
+    else eval_c (Comp (c, For (Number (n - 1), c))) s

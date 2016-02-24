@@ -28,3 +28,4 @@ type com =
   | Assg of string * aexp
   | Print of aexp
   | Skip
+  | For of aexp * com

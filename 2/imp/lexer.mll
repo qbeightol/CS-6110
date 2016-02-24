@@ -15,6 +15,7 @@ rule token = parse
   | "while" { WHILE }
   | "print" { PRINT }
   | "input" { INPUT }
+  | "for"   { FOR }
   | alph rest as id { VAR id }
   | number as number { NUMBER (int_of_string number) }
   | '&'    { AND }
