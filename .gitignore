@@ -13,4 +13,12 @@
 *.cmo
 *.cmi
 *.output
+
+# hw1
 lambda
+
+#hw2
+2/imp/lexer.ml
+2/imp/parser.ml
+2/imp/parser.mli
+2/imp/imp
