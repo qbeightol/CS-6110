@@ -1,10 +1,9 @@
 \documentclass[10pt]{article}
-\usepackage{amssymb}
-% \usepackage{amsmath}
-\usepackage{enumerate}
 \usepackage{fancyhdr}
 \usepackage{geometry}
 \usepackage{stmaryrd}
+\usepackage{amssymb, amsmath}
+\usepackage{enumerate, verbatim}
 
 \pagestyle{fancy}
 
@@ -22,7 +21,60 @@
 
 
 \begin{document}
-\problem{1 Observational Equivalence} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\problem{1 Observational Equivalence}
+
+\textbf{Lemma 1:}
+\begin{enumerate}[(i)]
+\item \textbf{Claim: } $\equiv_{obs}$ is an equivalence relation assuming that $\equiv$ is also an equivalence relation.
+
+\begin{enumerate}
+\item Consider a term $e$. We will prove that $e \equiv_{obs} e$.
+
+For any context $C$, $C[e] \Downarrow$ if and only if $C[e]$ itself converges. In other words,  $C[e] \Downarrow$ iff  $C[e] \Downarrow$.
+
+Suppose $C[e] \Downarrow v_1$ and $C[e] \Downarrow v_2$ under CBV evaluation. Since CBV is deterministic $v_1$ and $v_2$ must be syntactically equivalent. $\equiv$ is reflexive since it is an equivalence relation, $v_1 \equiv v_2$. Therefore $\equiv_{obs}$ is also reflexive.
+\item Suppose $e_1 \equiv_{obs} e_2$ we will prove that $e_2 \equiv_{obs} e_1$.
+
+$e_1 \equiv_{obs} e_2$ so $C[e_1] \Downarrow$ iff $C[e_2] \Downarrow \Rightarrow C[e_2] \Downarrow$ iff $C[e_1] \Downarrow$.
+
+Suppose $C[e_1] \Downarrow v_1$ and $C[e_2] \Downarrow v_2$ under CBV evaluation then $v_1 \equiv v_2$ since $e_1 \equiv_{obs} e_2 \Rightarrow v_2 \equiv v_2$ because $\equiv$ is symmetric.
+
+$\Rightarrow e_2 \equiv_{obs} e_1$. $\equiv_{obs}$ is symmetric.
+\item Let $e_1, e_2$ and $e_3$ be $3$ terms such that $e_1 \equiv_{obs} e_2$ and $e_2 \equiv_{obs} e_3$.
+
+For any context $C$, $C[e_1] \Downarrow$ if and only if $C[e_2] \Downarrow$ if and only if $C[e_3] \Downarrow$.
+
+Suppose $C[e_1] \Downarrow v_1, C[e_2] \Downarrow v_2$ and $C[e_3] \Downarrow v_3$ then $v_1 \equiv v_2$ and $v_2 \equiv v_3 \Rightarrow v_1 \equiv v_3$ as $\equiv$ is transitive.
+
+Thus $\equiv_{obs}$ is transitive. $\Box$
+\end{enumerate}
+\item \textbf{Claim}: $\equiv_{obs}$ refines $\equiv$.
+
+Let $v_1$ and $v_2$ be $2$ values such that $v_1 \equiv_{obs} v_2$. Let $C[.]$ be the context $[.]$ that only has a hole.
+
+$C[v_1] = v_1$ and $C[v_2] = v_2$.
+
+$C[v_1] \equiv C[v_2]$ since   $v_1 \equiv_{obs} v_2 \Rightarrow v_1 \equiv v_2 \Box$.
+\item This part is exactly the first condition in the definition of $\equiv_{obs}$.
+\item Suppose $\equiv^1$ refines $\equiv^2$ and $e_1 \equiv^1_{obs} e_2$. We will prove that $e_1 \equiv^2_{obs} e_2$.
+
+$e_1 \equiv^1_{obs} e_2$ so for any context $C$, $C[e_1] \Downarrow$ if and only if $C[e_2] \Downarrow$.
+
+If $C$ is a context such that $C[e_1] \Downarrow v_1$ and $C[e_2] \Downarrow v_2$ then $v_1 \equiv^1 v_2 \Rightarrow v_1 \equiv^2 v_2 \Box$. 
+\end{enumerate}
+
+\textbf{Theorem 2}: For CBV and CBN, $\equiv_{\Downarrow}$ is a fixpoint of the transformation $\equiv$  $\mapsto$  $\equiv_{obs}$  and is the coarsest such fixpoint.
+
+First we will prove that $e_1 \equiv_{\Downarrow} e_2$ if and only if $e_1  (\equiv_{\Downarrow})_{obs} e_2$.
+
+$(\Rightarrow)$ Suppose  $e_1 \equiv_{\Downarrow} e_2$ then by definition for any context $C$, $C[e_1] \Downarrow$ iff $C[e_2] \Downarrow$.
+
+Consider an arbitrary context $C$ such that $C[e_1] \Downarrow v_1$ and $C[e_2] \Downarrow v_2$ under CBV evaluation rules. In fact this entire proof can be used to prove the case for CBN evaluation just by replacing CBV with CBN.
+
+%TODO
+
+$(\Leftarrow)$ This follows directly from (ii) of Lemma 1. $(\equiv_{\Downarrow})_{obs}$ refines $\equiv_{\Downarrow}$.
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \problem{2 Set Operators and Fixed Points} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \problem{3 Combinators} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{enumerate}[(a)]
