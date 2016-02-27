@@ -63,7 +63,9 @@ $e_1 \equiv^1_{obs} e_2$ so for any context $C$, $C[e_1] \Downarrow$ if and only
 If $C$ is a context such that $C[e_1] \Downarrow v_1$ and $C[e_2] \Downarrow v_2$ then $v_1 \equiv^1 v_2 \Rightarrow v_1 \equiv^2 v_2 \Box$. 
 \end{enumerate}
 
-\textbf{Theorem 2}: For CBV and CBN, $\equiv_{\Downarrow}$ is a fixpoint of the transformation $\equiv$  $\mapsto$  $\equiv_{obs}$  and is the coarsest such fixpoint.
+%TODO
+%Fix the indentation
+\textbf{Theorem 2}: For CBV and CBN, $\equiv_{\Downarrow}$ is a fixed point of the transformation $\equiv$  $\mapsto$  $\equiv_{obs}$  and is the coarsest such fixed point.
 
 First we will prove that $e_1 \equiv_{\Downarrow} e_2$ if and only if $e_1  (\equiv_{\Downarrow})_{obs} e_2$.
 
@@ -74,13 +76,47 @@ Consider an arbitrary context $C$ such that $C[e_1] \Downarrow v_1$ and $C[e_2] 
 %TODO
 
 $(\Leftarrow)$ This follows directly from (ii) of Lemma 1. $(\equiv_{\Downarrow})_{obs}$ refines $\equiv_{\Downarrow}$.
+
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\problem{2 Set Operators and Fixed Points} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 
+\problem{2 Set Operators and Fixed Points}
+
+\textbf{Claim}: Given any set $A$ there is a least fixed point of $\overline R$.\\
+
+\textbf{Proof:} Suppose $\overline R$ is a set operator on some set $N$ then $\overline R : N \rightarrow N$ and $\overline R (N) \subseteq N$.
+
+But $N \subseteq \overline R (N)$ by definition of $\overline{N} \Rightarrow N = \overline{R} (N)$. $N$ is a fixed point.
+
+Let $\overline{A} = \bigcap \{A' | \overline{R} (A') = A' \text{ and } A \subseteq A'\}$. In other words $\overline{A}$ is the intersection of all the fixed point containing $A$. We know that there is at least one such fixed point, i.e. $N$ itself.
+
+First it's easy to see that $\overline{A}$ contains $A$.
+
+For any arbitrary fixed point $A'$ that contains $A$, $\overline{A} \subseteq A'\Rightarrow \overline{R} (\overline{A}) \subseteq \overline R (A') = A'$ by the monotinicity of $\overline R$. Since this is true for any fixed point $A'$ containing $A$,  $\overline{R} (\overline{A}) \subseteq \bigcap \{A' | \overline{R} (A') = A' \text{ and } A \subseteq A'\} = \overline{A}$.
+
+$\overline{A} \subseteq \overline{R} (\overline{A})$ so $\overline{A} = \overline{R} (\overline{A})$ and $\overline{A}$ is also a fixed point containing $A$.
+
+$\overline{A}$ is the least among all such fixed points as if $A'$ is also a fixed point containing $A$, $\overline{A} \subseteq A' \Box$.\\
+
+To get an example of set operator that is monotonic but not increasing, consider a set operator $S$ on the natural numbers $\mathbb{N}$: $S (A)\defined \{n+1 | n \in A\}$.
+
+If $A \subseteq B$ and $x \in S(A) \Rightarrow x-1 \in A \Rightarrow x-1 \in B \Rightarrow x \in S(B) \Rightarrow S(A) \subseteq S(B)$ so $S$ is monotonic.
+
+$S\{0\} = \{1\} \nsupseteq \{0\}$ so obviously $S$ is not increasing.
+
+Let $A = \{0\}$. To see that there is no least fixed point of $S$ that contains $A$ consider any nonempty set $B \subset \mathbb{N}$. There must exist a least element in $B$ (using the normal $\leq$ ordering). Let $x$ be this minimum element then it is easy to see that $x \notin S(B)$ else $x-1 \in B$ which contradicts to the assumption that no element less than $x$ belongs to $B$. So $B$ cannot be a fixed point of $S$. In fact the only fixed point of $S$ is $\varnothing$.
+
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 \problem{3 Combinators} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{enumerate}[(a)]
-  \item
-  \item
-  \item
+  \item $\I \defined \S~\K~\K$
+  
+  $\S~\K~\K~x \rightarrow \K~x~(\K~x) \rightarrow x$
+  \item $ \lambda x y.y \defined \S~\K$
+  
+  $\S~\K~x~y \rightarrow \K~x(y~x) \rightarrow x$
+  \item $\Omega \defined (\S~ \I~ \I) (\S~ \I~ \I)$
+  
+  $\S~ \I~ \I~x \rightarrow \I ~ x ~ (\I ~ x) \rightarrow x~x$
   \item
   \item
 
