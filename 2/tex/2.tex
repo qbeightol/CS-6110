@@ -1,9 +1,12 @@
 \documentclass[10pt]{article}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
 \usepackage{fancyhdr}
 \usepackage{geometry}
 \usepackage{mathpartir}
+% \usepackage{parskip}
 \usepackage{stmaryrd}
-\usepackage{amssymb, amsmath}
 \usepackage{enumerate, verbatim}
 
 \pagestyle{fancy}
@@ -13,7 +16,7 @@
 
 
 % Commands %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newcommand{\problem}[1]{\subsection*{\sf #1}}
+\newcommand{\problem}[1]{\section{\sf #1}}
 \newcommand{\translate}[2]{\ensuremath {\llbracket #1 \rrbracket}_{#2}}
 \newcommand{\defined}{\triangleq}
 \renewcommand{\S}{\textsf{S}}
@@ -28,6 +31,7 @@
 \newcommand{\bigStepsA}{\Downarrow_a}
 \newcommand{\bigStepsB}{\Downarrow_b}
 \newcommand{\bigSteps}{\Downarrow}
+\renewcommand{\gets}[2]{#1~\texttt{:=}~#2}
 \newcommand{\Rule}[3]{
   [\textsc{#1}]~
   \label{rule:#1}
@@ -44,9 +48,12 @@
   \hfill
 }
 
+\newtheorem{claim}{Claim}[section]
+\newtheorem{lemma}{Lemma}[claim]
+
 
 \begin{document}
-\problem{1 Observational Equivalence}
+\problem{Observational Equivalence}
 
 \textbf{Lemma 1:}
 \begin{enumerate}[(i)]
@@ -104,7 +111,7 @@ $(\Leftarrow)$ This follows directly from (ii) of Lemma 1. $(\equiv_{\Downarrow}
 
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\problem{2 Set Operators and Fixed Points}
+\problem{Set Operators and Fixed Points}
 
 \textbf{Claim}: Given any set $A$ there is a least fixed point of $\overline R$.\\
 
@@ -131,7 +138,7 @@ $S\{0\} = \{1\} \nsupseteq \{0\}$ so obviously $S$ is not increasing.
 Let $A = \{0\}$. To see that there is no least fixed point of $S$ that contains $A$ consider any nonempty set $B \subset \mathbb{N}$. There must exist a least element in $B$ (using the normal $\leq$ ordering). Let $x$ be this minimum element then it is easy to see that $x \notin S(B)$ else $x-1 \in B$ which contradicts to the assumption that no element less than $x$ belongs to $B$. So $B$ cannot be a fixed point of $S$. In fact the only fixed point of $S$ is $\varnothing$.
 
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\problem{3 Combinators} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\problem{Combinators} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{enumerate}[(a)]
   \item $\I \defined \S~\K~\K$
 
@@ -163,7 +170,7 @@ Let $A = \{0\}$. To see that there is no least fixed point of $S$ that contains 
   To translate closed $\lambda$-terms, use the empty context (denoted $\cdot$).
 
 \end{enumerate}
-\problem{4 For Loops} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\problem{For Loops} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{enumerate}[(a)]
   \item
   \Rule{LoopEvalA}{
@@ -193,10 +200,87 @@ Let $A = \{0\}$. To see that there is no least fixed point of $S$ that contains 
     \config{\for a c}{\sigma} \bigSteps \sigma
   }{$n \leq 0$}
 
+  \item
+  % \underline{Claim:} \\*
+  \begin{claim}
+    If   $\config{c}{\sigma} \bigSteps \sigma_1$
+    and  $\config{c}{\sigma} \bigSteps \sigma_2$
+    then $\sigma_1 = \sigma_2$
+  \end{claim}
+
+  \begin{proof} By induction on the derivation of $\config{c}{\sigma} \bigSteps
+    \sigma_1$ and a case analysis on the last rule used in that derivation.
+    We'll also use the following lemmas:
+
+    \begin{lemma} \label{evalA}
+      If   $\config{a}{\sigma} \bigStepsA n_1$
+      and  $\config{a}{\sigma} \bigStepsA n_2$
+      then $n_1 = n_2$.
+    \end{lemma}
+
+    \begin{lemma} \label{evalB}
+      If   $\config{b}{\sigma} \bigStepsB t_1$
+      and  $\config{b}{\sigma} \bigStepsB t_2$
+      then $t_1 = t_2$.
+    \end{lemma}
+
+    \underline{Skip:} $c = \impSkip$ so the the only applicable evaluation rule
+    is $\config{c}{\sigma} \bigSteps \sigma$. Both $\sigma_1$ and $\sigma_2$
+    must equal $\sigma$. \\*
+
+    \underline{Assignment:}
+    Here, $c = x := a$ and the derivation for $\config{c}{\sigma} \bigSteps
+    \sigma_1$ takes the following form:
+
+    $$\inferrule{
+      \config{a}{\sigma} \bigStepsA n_1
+    }{
+      \config{x := a}{\sigma} \bigSteps \sigma[n_1 / x]
+    }$$
+
+    Because $c$ is an assignment, the last step in the $\config{c}{\sigma}
+    \bigSteps \sigma_1$ derivation must use IMP's evaluation assignment rule:
+
+    $$\inferrule{
+      \config{a}{\sigma} \bigStepsA n_2
+    }{
+      \config{x := a}{\sigma} \bigSteps \sigma[n_2 / x]
+    }$$
+
+    Applying \ref{evalA} provides $n_1 = n_2$, which implies $\sigma_1 =
+    \sigma_2$. \\*
+
+    \underline{Sequence:}
+
+    $$ c = c_1; c_2 $$
+
+    $ \inferrule{
+      \config{c_1}{\sigma}    \bigSteps \sigma_1'\\
+      \config{c_2}{\sigma_1'} \bigSteps \sigma_1 \\
+    }{
+      \config{c_1; c_2}{\sigma} \bigSteps \sigma_1 \\
+    }
+    \hfill
+    \inferrule{
+      \config{c_1}{\sigma}    \bigSteps \sigma_2'\\
+      \config{c_2}{\sigma_2'} \bigSteps \sigma_2 \\
+    }{
+      \config{c_1; c_2}{\sigma} \bigSteps \sigma_2 \\
+    }
+    $ \\*
+
+    Applying the inductive hypothesis yields $\sigma_1' = \sigma_2'$, and
+    applying the IH again provides $\sigma_1 = \sigma_2$.
+
+
+  \end{proof}
+
+
+
 \end{enumerate}
-\problem{5 Implementing IMP} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\problem{Implementing IMP} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 See our IMP submission.
-\problem{6 Debriefing} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\problem{Debriefing} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 DO NOT FORGET THIS TIMEEEEE
 
 \begin{enumerate}[(a)]
