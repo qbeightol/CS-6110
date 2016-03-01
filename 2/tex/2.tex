@@ -28,6 +28,10 @@
 \newcommand{\for}[2]{\textsf{for}~#1~\textsf{do}~#2}
 \newcommand{\config}[2]{\langle#1,~#2\rangle}
 \newcommand{\impSkip}{\textsf{skip}}
+\newcommand{\impIf}[3]{\textsf{if}~#1~\textsf{then}~#2~\textsf{else}~#3}
+\newcommand{\while}[2]{\textsf{while}~#1~\textsf{do}~#2}
+\newcommand{\true}{\textsf{true}}
+\newcommand{\false}{\textsf{false}}
 \newcommand{\bigStepsA}{\Downarrow_a}
 \newcommand{\bigStepsB}{\Downarrow_b}
 \newcommand{\bigSteps}{\Downarrow}
@@ -177,32 +181,33 @@ Let $A = \{0\}$. To see that there is no least fixed point of $S$ that contains 
     \config{a}{\sigma} \stepsA a'
   }{
     \config{\for{a}{c}}{\sigma} \steps \config{\for{a'}{c}}{\sigma}
-  }
+  } \\*
+
+  \RuleWithCondition{LoopExit}{}{
+    \config{\for n c}{\sigma} \steps \config{\impSkip}{\sigma}
+  }{$n \leq 0$} \\*
 
   \RuleWithCondition{LoopEvalBody}{}{
     \config{\for n c}{\sigma} \steps \config{c; \for{n - 1}{c}}{\sigma}
-  }{$n > 0$}
-  \RuleWithCondition{LoopExit}{}{
-    \config{\for n c}{\sigma} \steps \config{\impSkip}{\sigma}
-  }{$n \leq 0$}
+  }{$n > 0$} \\*
 
   \item
+  \RuleWithCondition{LoopSkip}{
+    a \bigStepsA n
+  }{
+    \config{\for a c}{\sigma} \bigSteps \sigma
+  }{$n \leq 0$} \\*
+
   \RuleWithCondition{LoopUnroll}{
     a \bigStepsA n \\
     \forall i \in [1, n].~\config{c}{\sigma_i} \bigSteps \sigma_{i+1}
   }{
     \config{\for a c}{\sigma_1} \bigSteps \sigma_{n+1}
-  }{$n > 0$}
-
-  \RuleWithCondition{LoopSkip}{
-    a \bigStepsA n
-  }{
-    \config{\for a c}{\sigma} \bigSteps \sigma
-  }{$n \leq 0$}
+  }{$n > 0$} \\*
 
   \item
   % \underline{Claim:} \\*
-  \begin{claim}
+  \begin{claim} \label{claimFour}
     If   $\config{c}{\sigma} \bigSteps \sigma_1$
     and  $\config{c}{\sigma} \bigSteps \sigma_2$
     then $\sigma_1 = \sigma_2$
@@ -224,11 +229,22 @@ Let $A = \{0\}$. To see that there is no least fixed point of $S$ that contains 
       then $t_1 = t_2$.
     \end{lemma}
 
-    \underline{Skip:} $c = \impSkip$ so the the only applicable evaluation rule
+    Additionally, whenever the derivation for $\config{c}{\sigma} \bigSteps
+    \sigma_1$ uses a rule $R$ at it's base, the
+    derivation for $\config{c}{\sigma} \bigSteps \sigma_2$ must also have $R$
+    at its base. This stems from the fact that only a few rules apply to each
+    syntactic form of $c$ (and frequently, just 1 rule applies). And among the
+    multiple rules that apply to some forms (e.g. {\tt while}), it's impossible
+    to use one rule for one $\bigSteps$ judment and not the other $\bigSteps$
+    judgment---that would
+    contradict either \ref{evalA} or \ref{evalB}. \\*
+
+    \underline{\sc Skip:} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    $c = \impSkip$ so the the only applicable evaluation rule
     is $\config{c}{\sigma} \bigSteps \sigma$. Both $\sigma_1$ and $\sigma_2$
     must equal $\sigma$. \\*
 
-    \underline{Assignment:}
+    \underline{\sc Assignment:} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     Here, $c = x := a$ and the derivation for $\config{c}{\sigma} \bigSteps
     \sigma_1$ takes the following form:
 
@@ -250,28 +266,163 @@ Let $A = \{0\}$. To see that there is no least fixed point of $S$ that contains 
     Applying \ref{evalA} provides $n_1 = n_2$, which implies $\sigma_1 =
     \sigma_2$. \\*
 
-    \underline{Sequence:}
-
+    \underline{Sequence:} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     $$ c = c_1; c_2 $$
 
-    $ \inferrule{
+    $$ \inferrule{
       \config{c_1}{\sigma}    \bigSteps \sigma_1'\\
       \config{c_2}{\sigma_1'} \bigSteps \sigma_1 \\
     }{
       \config{c_1; c_2}{\sigma} \bigSteps \sigma_1 \\
     }
-    \hfill
+    \hspace{1cm}
     \inferrule{
       \config{c_1}{\sigma}    \bigSteps \sigma_2'\\
       \config{c_2}{\sigma_2'} \bigSteps \sigma_2 \\
     }{
       \config{c_1; c_2}{\sigma} \bigSteps \sigma_2 \\
     }
-    $ \\*
+    $$ \\*
 
     Applying the inductive hypothesis yields $\sigma_1' = \sigma_2'$, and
     applying the IH again provides $\sigma_1 = \sigma_2$.
 
+    \underline{If-True:} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    $$ c = \impIf{b}{c_t}{c_f} $$
+
+    $$ \inferrule{
+      \config{b}{\sigma} \bigStepsB \true \\
+      \config{c_t}{\sigma} \bigSteps \sigma_1 \\
+    }{
+      \config{\impIf{b}{c_t}{c_f}}{\sigma} \bigSteps \sigma_1 \\
+    }$$
+
+    Additionally, the derivation of $\config{\impIf{b}{c_t}{c_f}}{\sigma}
+    \bigSteps \sigma_2$ must use the \textsc{IfTrue} rule:
+
+    $$ \inferrule{
+      \config{b}{\sigma} \bigStepsB \true \\
+      \config{c_t}{\sigma} \bigSteps \sigma_2 \\
+    }{
+      \config{\impIf{b}{c_t}{c_f}}{\sigma} \bigSteps \sigma_1 \\
+    } $$
+
+    If the derivation used the \textsc{IfFalse} rule, that would imply
+    $\config{b}{\sigma} \bigStepsB \false$, which contradicts \ref{evalB}. \\*
+
+    Applying the IH gives $\sigma_1 = \sigma_2$. \\*
+
+    \underline{If-False:} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    $$ c = \impIf{b}{c_t}{c_f} $$
+
+    $$\inferrule{
+      \config{b}{\sigma} \bigStepsB \false \\
+      \config{c_f}{\sigma} \bigSteps \sigma_1 \\
+    }{
+      \config{\impIf{b}{c_t}{c_f}}{\sigma} \bigSteps \sigma_1 \\
+    }
+    \hspace{1cm}
+    \inferrule{
+      \config{b}{\sigma} \bigStepsB \false \\
+      \config{c_f}{\sigma} \bigSteps \sigma_2 \\
+    }{
+      \config{\impIf{b}{c_t}{c_f}}{\sigma} \bigSteps \sigma_2 \\
+    }
+    $$
+
+    Again, the latter derivation must use \textsc{IfFalse}---using the other
+    rule would contradict \ref{evalA}. Applying the IH gives
+    $\sigma_1 = \sigma_2$. \\*
+
+    \underline{\textsc{WhileTrue:}} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Here, $$ c = \while b c' $$ and either \textsc{WhileTrue} was used to derive
+    % both $\bigSteps$ judgments or \textsc{WhileFalse} is the last judgment of
+    % both derivations. Again only the while rules are applicable to $c$, so if
+    % the previous claim weren't true, it would contradict \ref{evalB}.
+
+    Here, $c = \while b {c'}$ and both $\bigSteps$ jugdments must use the
+    \textsc{WhileTrue} rule at their base:
+
+    $$\inferrule{
+      \config{b}{\sigma} \bigStepsB \true \\
+      \config{c'}{\sigma} \bigSteps \sigma_1
+    }{
+      \config{\while b {c'}}{\sigma} \bigSteps \sigma_1 \\
+    }
+    \hspace{1cm}
+    \inferrule{
+      \config{b}{\sigma} \bigStepsB \true \\
+      \config{c'}{\sigma} \bigSteps \sigma_2
+    }{
+      \config{\while b {c'}}{\sigma} \bigSteps \sigma_2 \\
+    }
+    $$
+
+    Applying the IH provides $\sigma_1 = \sigma_2$ \\*
+
+    \underline{\sc WhileFalse:} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    Again, $c = \while b {c'}$ and both $\bigSteps$ judgment derivations must
+    end with the \textsc{WhileFalse} rule:
+
+    $$
+    \inferrule{
+      \config{b}{\sigma} \bigStepsB \false
+    }{
+      \config{c'}{\sigma} \bigSteps \sigma
+    }
+    $$
+
+    This fact implies that $\sigma_1$ and $\sigma_2$ are both equal to
+    $\sigma$. \\*
+
+    \underline{\sc LoopSkip:} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    $$ c = \for{a}{c'} $$
+
+    $$\inferrule{
+      a \bigStepsA n
+    }{
+      \config{\for{a}{c'}}{\sigma} \bigSteps \sigma
+    }(n \leq 0)
+    \hspace{1cm}
+    \inferrule{
+      a \bigStepsA n
+    }{
+      \config{\for{a}{c'}}{\sigma} \bigSteps \sigma
+    }(n \leq 0)
+    $$
+
+    Both $\sigma_1$ and $\sigma_2$ are $\sigma$, so $\sigma_1 = \sigma_2$. \\*
+
+    \underline{\sc LoopUnroll:} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    $$ c = \for{a}{c'} $$
+
+    $$ \inferrule{
+      a \bigStepsA n \\
+      \forall i \in [1, n].~\config{c'}{\sigma^1_i} \bigSteps \sigma^1_{i+1}
+    }{
+      \config{\for a {c'}}{\sigma^1_1} \bigSteps \sigma^1_{n+1}
+    }(n > 0)
+    \hspace{1cm}
+    \inferrule{
+      a \bigStepsA n \\
+      \forall i \in [1, n].~\config{c'}{\sigma^2_i} \bigSteps \sigma^2_{i+1}
+    }{
+      \config{\for a {c'}}{\sigma_1} \bigSteps \sigma^2_{n+1}
+    }(n > 0)
+    $$
+
+    Where $\sigma_1 = \sigma^1_1 = \sigma^2_2$, $\sigma_1 = \sigma^1_{n+1}$ and
+    $\sigma_2 = \sigma^2_{n+1}$ \\*
+
+    We can repeatedly apply the inductive hypothesis to see that $\sigma^1_i
+    = \sigma^2_1$ for any integer $i$ in $[1, n+1]$; $\sigma^1_0 =
+    \sigma^2_0$ comes from our assumptions, and if $\sigma^1_i = \sigma^2_i$
+    for some $i$, then we can apply the IH (for \ref{claimFour}) to see that
+    $\sigma^1_{i+1} = \sigma^2_{i+1}$. Consequently, $\sigma_1 = \sigma^1_{n+1}
+    = \sigma^2_{n+1} = \sigma^2$.
 
   \end{proof}
 
