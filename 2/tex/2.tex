@@ -105,13 +105,31 @@ If $C$ is a context such that $C[e_1] \Downarrow v_1$ and $C[e_2] \Downarrow v_2
 
 First we will prove that $e_1 \equiv_{\Downarrow} e_2$ if and only if $e_1  (\equiv_{\Downarrow})_{obs} e_2$.
 
-$(\Rightarrow)$ Suppose  $e_1 \equiv_{\Downarrow} e_2$ then by definition for any context $C$, $C[e_1] \Downarrow$ iff $C[e_2] \Downarrow$.
+$(\Rightarrow)$ For this direction we will make use of 2 lemmas, one of which will be proved here.\\
 
-Consider an arbitrary context $C$ such that $C[e_1] \Downarrow v_1$ and $C[e_2] \Downarrow v_2$ under CBV evaluation rules. In fact this entire proof can be used to prove the case for CBN evaluation just by replacing CBV with CBN.
+\textbf{Lemma 2.1:} If $e \Downarrow v$ then $e \equiv_{\Downarrow} v$.\\
 
-%TODO
+\textbf{Lemma 2.2:} If $e_1 \equiv_{\Downarrow} e_2$ then $C[e_1] \equiv_{\Downarrow} C[e_2]$ for any context $C$.
 
-$(\Leftarrow)$ This follows directly from (ii) of Lemma 1. $(\equiv_{\Downarrow})_{obs}$ refines $\equiv_{\Downarrow}$.
+\textbf{Proof of 2.2:} Consider an arbitrary context $C'$. We want to show that $C'[C[e_1]] \Downarrow \Leftrightarrow C'[C[e_2]] \Downarrow$.
+
+Let $C_1 = C'[C]$ which is the context $C'$ with $C$ substituted into the hole. Then $C_1$ is also a context and thus $C_1[e_1] \Downarrow \Leftrightarrow C_1[e_2] \Downarrow$ which is equivalent to the claim. $\Box$\\
+
+Suppose  $e_1 \equiv_{\Downarrow} e_2$ we want to show that $e_1 \equiv_{\Downarrow} e_2.$
+
+By definition for any context $C$, $C[e_1] \Downarrow$ iff $C[e_2] \Downarrow$.
+
+Consider an arbitrary context $C$ such that $C[e_1] \Downarrow v_1$ and $C[e_2] \Downarrow v_2$, we wish to show that $v_1 \equiv_{\Downarrow} v_2$.
+
+Using lemma 2.1, $C[e_1] \equiv_{\Downarrow} v_1$ and $C[e_2] \equiv_{\Downarrow} v_2$. By lemma 2.2, $C[e_1] \equiv_{\Downarrow} C[e_2]$ so by transitivity we have $v_1 \equiv_{\Downarrow} v_2.$\\
+
+$(\Leftarrow)$ This follows directly from (ii) of Lemma 1. $(\equiv_{\Downarrow})_{obs}$ refines $\equiv_{\Downarrow}$.\\
+
+Next we need to show that if $\equiv$ is a fixed point then it refines $\equiv_{\Downarrow}$.
+
+Suppose $e_1 \equiv e_2$ then since $\equiv = \equiv_{obs}$, $e_1 \equiv_{obs} e_2$. 
+
+So for any context $C$, $C[e_1] \Downarrow$ iff $C[e_2] \Downarrow \Rightarrow e_1 \equiv_{\Downarrow} e_2~ \Box$. 
 
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
