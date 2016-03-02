@@ -207,6 +207,50 @@ Let $A = \{0\}$. To see that there is no least fixed point of $S$ that contains 
 
   \item
   % \underline{Claim:} \\*
+  \begin{lemma} \label{evalA}
+    If   $\config{a}{\sigma} \bigStepsA n_1$
+    and  $\config{a}{\sigma} \bigStepsA n_2$
+    then $n_1 = n_2$.
+  \end{lemma}
+
+  \begin{lemma} \label{evalB}
+    If   $\config{b}{\sigma} \bigStepsB t_1$
+    and  $\config{b}{\sigma} \bigStepsB t_2$
+    then $t_1 = t_2$.
+  \end{lemma}
+
+  \begin{lemma} \label{oneRule}
+    If $\config{c}{\sigma} \bigSteps \sigma_1$
+    and $\config{c}{\sigma} \bigSteps \sigma_2$
+    then all derivations of both $\bigSteps$ judgements use the same rule $R$
+    at the base of their derivation (by ``base'' we mean term that appears
+    at the bottom of the derivation for the judgment, or, equivalently, the
+    root of the derivation when the derivation is viewed as a tree).
+  \end{lemma}
+
+  \begin{proof}
+    Consider the different forms of $c$. For skips, assignments, and
+    sequences, there is only $\bigSteps$ rule that could be applied.
+    Consequently, the derivations must use the same rule at their base.
+
+    \underline{$c = \impIf{b}{c_t}{c_f}$:} Assume, for the sake of contradiction, that
+    two derivation used different rules at their base. Both rules must be
+    one of the conditional rules, so one derivation must use the
+    \textsc{IfTrue} rule while the other uses the \textsc{IfFalse} rule.
+    That implies that one derivation showed $\config{b}{\sigma} \bigStepsB
+    \true$, while the other shows that $\config{b}{\sigma} \bigStepsB \false$,
+    which contradicts \ref{evalB}.
+
+    \underline{$c = \while{b}{c'}$:} Again assume that two derivations used
+    different rules at their base. One rule must use the \textsc{WhileTrue}
+    rule while the other uses the \textsc{WhileFalse} rule, which contradicts
+    \ref{evalB}
+
+    \underline{$c = \for{a}{c'}$:} Assume two derivations used different rules
+    at their base. One must use \textsc{LoopSkip} while the other uses
+    \textsc{LoopUnroll}, which contradicts \ref{evalA}.
+  \end{proof}
+
   \begin{claim} \label{claimFour}
     If   $\config{c}{\sigma} \bigSteps \sigma_1$
     and  $\config{c}{\sigma} \bigSteps \sigma_2$
@@ -215,29 +259,16 @@ Let $A = \{0\}$. To see that there is no least fixed point of $S$ that contains 
 
   \begin{proof} By induction on the derivation of $\config{c}{\sigma} \bigSteps
     \sigma_1$ and a case analysis on the last rule used in that derivation.
-    We'll also use the following lemmas:
 
-    \begin{lemma} \label{evalA}
-      If   $\config{a}{\sigma} \bigStepsA n_1$
-      and  $\config{a}{\sigma} \bigStepsA n_2$
-      then $n_1 = n_2$.
-    \end{lemma}
-
-    \begin{lemma} \label{evalB}
-      If   $\config{b}{\sigma} \bigStepsB t_1$
-      and  $\config{b}{\sigma} \bigStepsB t_2$
-      then $t_1 = t_2$.
-    \end{lemma}
-
-    Additionally, whenever the derivation for $\config{c}{\sigma} \bigSteps
-    \sigma_1$ uses a rule $R$ at it's base, the
-    derivation for $\config{c}{\sigma} \bigSteps \sigma_2$ must also have $R$
-    at its base. This stems from the fact that only a few rules apply to each
-    syntactic form of $c$ (and frequently, just 1 rule applies). And among the
-    multiple rules that apply to some forms (e.g. {\tt while}), it's impossible
-    to use one rule for one $\bigSteps$ judment and not the other $\bigSteps$
-    judgment---that would
-    contradict either \ref{evalA} or \ref{evalB}. \\*
+    % Additionally, whenever the derivation for $\config{c}{\sigma} \bigSteps
+    % \sigma_1$ uses a rule $R$ at it's base, the
+    % derivation for $\config{c}{\sigma} \bigSteps \sigma_2$ must also have $R$
+    % at its base. This stems from the fact that only a few rules apply to each
+    % syntactic form of $c$ (and frequently, just 1 rule applies). And among the
+    % multiple rules that apply to some forms (e.g. {\tt while}), it's impossible
+    % to use one rule for one $\bigSteps$ judment and not the other $\bigSteps$
+    % judgment---that would
+    % contradict either \ref{evalA} or \ref{evalB}. \\*
 
     \underline{\sc Skip:} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     $c = \impSkip$ so the the only applicable evaluation rule
@@ -288,28 +319,32 @@ Let $A = \{0\}$. To see that there is no least fixed point of $S$ that contains 
     applying the IH again provides $\sigma_1 = \sigma_2$.
 
     \underline{If-True:} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    Here,
 
     $$ c = \impIf{b}{c_t}{c_f} $$
+
+    and both judgments must have the same rule at their base (because of
+    \ref{oneRule}):
 
     $$ \inferrule{
       \config{b}{\sigma} \bigStepsB \true \\
       \config{c_t}{\sigma} \bigSteps \sigma_1 \\
     }{
       \config{\impIf{b}{c_t}{c_f}}{\sigma} \bigSteps \sigma_1 \\
-    }$$
-
-    Additionally, the derivation of $\config{\impIf{b}{c_t}{c_f}}{\sigma}
-    \bigSteps \sigma_2$ must use the \textsc{IfTrue} rule:
-
-    $$ \inferrule{
+    }
+    \hspace{1cm}
+    \inferrule{
       \config{b}{\sigma} \bigStepsB \true \\
       \config{c_t}{\sigma} \bigSteps \sigma_2 \\
     }{
       \config{\impIf{b}{c_t}{c_f}}{\sigma} \bigSteps \sigma_1 \\
-    } $$
+    }$$
 
-    If the derivation used the \textsc{IfFalse} rule, that would imply
-    $\config{b}{\sigma} \bigStepsB \false$, which contradicts \ref{evalB}. \\*
+    % Additionally, the derivation of $\config{\impIf{b}{c_t}{c_f}}{\sigma}
+    % \bigSteps \sigma_2$ must use the \textsc{IfTrue} rule:
+
+    % If the derivation used the \textsc{IfFalse} rule, that would imply
+    % $\config{b}{\sigma} \bigStepsB \false$, which contradicts \ref{evalB}. \\*
 
     Applying the IH gives $\sigma_1 = \sigma_2$. \\*
 
@@ -331,10 +366,10 @@ Let $A = \{0\}$. To see that there is no least fixed point of $S$ that contains 
       \config{\impIf{b}{c_t}{c_f}}{\sigma} \bigSteps \sigma_2 \\
     }
     $$
-
-    Again, the latter derivation must use \textsc{IfFalse}---using the other
-    rule would contradict \ref{evalA}. Applying the IH gives
-    $\sigma_1 = \sigma_2$. \\*
+    %
+    % Again, the latter derivation must use \textsc{IfFalse}---using the other
+    % rule would contradict \ref{evalA}.
+    Applying the IH gives $\sigma_1 = \sigma_2$. \\*
 
     \underline{\textsc{WhileTrue:}} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Here, $$ c = \while b c' $$ and either \textsc{WhileTrue} was used to derive
