@@ -40,19 +40,40 @@ let rec is_target_prog (e : exp) : bool =
 let convert (e : exp) (s : state) : exp * state =
   let e_vars = allv e in
   let var_gen = Fresh.make e_vars in
+  let rec apply_to_all_expr e xs = match xs with
+    | []     -> e
+    | hd::tl -> apply_to_all_expr (App (e, Var hd)) tl
+  in
   let rec convert e s0 =
     match e with
-    | Let ([x], e1, e2) ->
-      convert e1 s0  |> fun (e1', s1) ->
-      convert e2 s1 |> fun (e2', s2) ->
+    | Var _ -> (e, s0)
+    | Fun (args, body) ->
+      convert body s0 |> fun (body', s1) ->
+      let e_fvs = HashSet.values (fv e) in
       let f = Fresh.next var_gen in
+      let s2 = update s1 f (Closure (Fun (e_fvs@args, body'), State.make ())) in
+      (apply_to_all_expr (Var f) e_fvs, s2)
+    | Let (f::args, e1, e2) ->
+      convert (Fun (args, e1)) s0  |> fun (e1', s1) ->
+      convert e2 s1  |> fun (e2', s2) ->
+      let g = Fresh.next var_gen in
       let e2_fvs = HashSet.values (fv e2) in
-      let s3 = update s2 f (Closure (Fun (x::e2_fvs, e2'), State.make ())) in
-      (App (Var f, e1'), s3)
-    (* | Let (f::args, body, e) ->  *)
-    | App (e1, e2) -> convert e s |>
-      fun (e', s') -> convert e2 s'
-    | _ -> failwith "Implement me!"
+      let s3 = update s2 g (Closure (Fun (f::e2_fvs, e2'), State.make ())) in
+      (* todo pass environment args into g *)
+      (App (Var g, e1'), s3)
+    | Letrec (f::args, e1, e2) ->
+      convert (Fun (args, e1)) s0  |> fun (e1', s1) ->
+      convert e2 s1  |> fun (e2', s2) ->
+      let g = Fresh.next var_gen in
+      let e2_fvs = HashSet.values (fv e2) in
+      let s3 = update s2 g (Closure (Fun (f::e2_fvs, e2'), State.make ())) in
+      (* todo pass environment args into g *)
+      (App (Var g, e1'), s3)
+    | App (e1, e2) ->
+      convert e1 s0 |> fun (e1', s1) ->
+      convert e2 s1 |> fun (e2', s2) ->
+      (App (e1', e2), s2)
+    | _ -> failwith "not implementend"
   in convert e s
 
 let rec to_expr bs e = match bs with
