@@ -2,6 +2,7 @@
 \usepackage{fancyhdr}
 \usepackage{enumerate}
 \usepackage{geometry}
+\usepackage{parskip}
 \usepackage{sectsty}
 
 % fancyhdr %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -15,15 +16,92 @@
 
 % Macros %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\newcommand{\stepsTo}{\rightarrow}
+\newcommand{\multiStepsTo}{\stepsTo^*}
+
 % Document %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{document}
 \section{Static and Dynamic Scope}%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Mutual Fixpoints}%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{enumerate}
-    \item
-    \item
-\end{enumerate}
+We solved this problem by first doing the karma and then instantiating our
+karma solution in the case where $n = 2$. Consequently, we'll present this
+section out of order so that it's easier to undestand our solution to part (a).
+
+We'll abuse $\overline{e}$ to generally denote some expression $e$ repeated $n$ times.
+
+Specifically, let $\overline{x}$ be a shorthand for $x_1~x_2~\ldots~x_n$. So $f~\overline{x}$
+denotes $f~x_1~x_2~\ldots~x_n$ and $\lambda \overline{t}.e$ denotes a function
+that accepts $n$ arguments.
+
+Let $\overline{{f \overline{f}}} = (f_1 \overline{f})~(f_2 \overline{f})~\ldots~(f_n \overline{f})$.
+
+Let $\overline{\lambda \overline{f}~. t_i~(\overline{f~\overline{f}})}
+= (\lambda \overline{f}.~t_1~(\overline{f~\overline{f}}))
+  (\lambda \overline{f}.~t_2~(\overline{f~\overline{f}}))
+  \ldots
+  (\lambda \overline{f}.~t_n~(\overline{f~\overline{f}}))$
+
+Then we can write the generalized Y-combinator this way:
+
+$$Y^n_j = \lambda \overline{t}.
+    ~(\lambda \overline{f} .~t_j~(\overline{f_i~\overline{f}}))
+    ~\overline{\lambda \overline{f} .~t_i~(\overline{f~\overline{f}})} $$
+
+where the $n$ in $Y^n_j$ specificies how many times an expression should be
+repeated.
+
+Instantiating $Y^n_i$ for the $n = 2$ case gives these two combinators:
+
+\begin{eqnarray*}
+    Y^2_1 & = \lambda t_1 t_2 . & (\lambda f g.~t_1~(f~f~g)~(g~f~g)) \\
+          &                     & (\lambda f g.~t_1~(f~f~g)~(g~f~g)) \\
+          &                     & (\lambda f g.~t_2~(f~f~g)~(g~f~g))
+\end{eqnarray*}
+
+\begin{eqnarray*}
+    Y^2_1 & = \lambda t_1 t_2 . & (\lambda f g .~t_2~(f~f~g)~(g~f~g)) \\
+          &                     & (\lambda f g .~t_1~(f~f~g)~(g~f~g)) \\
+          &                     & (\lambda f g .~t_2~(f~f~g)~(g~f~g))
+\end{eqnarray*}
+
+Passing in $F$ and $G$ to each combinator yields the following:
+
+\begin{eqnarray*}
+    Y^2_1~F~G & =             & (\lambda f g .~F~(f~f~g)~(g~f~g)) \\
+              &               & (\lambda f g .~F~(f~f~g)~(g~f~g)) \\
+              &               & (\lambda f g .~G~(f~f~g)~(g~f~g)) \\
+              & \multiStepsTo & F~((\lambda f g .~F~(f~f~g)~(g~f~g)) \\
+              &               & \hspace{.45cm}(\lambda f g .~F~(f~f~g)~(g~f~g)) \\
+              &               & \hspace{.45cm}(\lambda f g .~G~(f~f~g)~(g~f~g))) \\
+              &               & \hspace{.35cm}((\lambda f g .~G~(f~f~g)~(g~f~g)) \\
+              &               & \hspace{.45cm}(\lambda f g .~F~(f~f~g)~(g~f~g)) \\
+              &               & \hspace{.45cm}(\lambda f g .~G~(f~f~g)~(g~f~g)))
+\end{eqnarray*}
+
+Meanwhile,
+
+\begin{eqnarray*}
+    Y^2_1~F~G & =             & (\lambda f g .~F~(f~f~g)~(g~f~g)) \\
+              &               & (\lambda f g .~F~(f~f~g)~(g~f~g)) \\
+              &               & (\lambda f g .~G~(f~f~g)~(g~f~g)) \\
+              & \multiStepsTo & F~((\lambda f g .~G~(f~f~g)~(g~f~g)) \\
+              &               & \hspace{.45cm}(\lambda f g .~F~(f~f~g)~(g~f~g)) \\
+              &               & \hspace{.45cm}(\lambda f g .~G~(f~f~g)~(g~f~g))) \\
+              &               & \hspace{.35cm}((\lambda f g .~G~(f~f~g)~(g~f~g)) \\
+              &               & \hspace{.45cm}(\lambda f g .~F~(f~f~g)~(g~f~g)) \\
+              &               & \hspace{.45cm}(\lambda f g .~G~(f~f~g)~(g~f~g)))
+\end{eqnarray*}
+
+By comparing the definitions of $Y^2_i~F~G$ with the results of partially
+evaluating $Y^2_i~F~G$, we can see that
+
+$$Y^2_1~F~G = F~(Y^2_1~F~G)~(Y^2_2~F~G) $$
+
+and
+
+$$Y^2_1~F~G = G~(Y^2_1~F~G)~(Y^2_2~F~G) $$
+
 \section{State}%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{enumerate}
     \item
