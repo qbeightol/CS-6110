@@ -23,6 +23,19 @@
 
 \begin{document}
 \section{Static and Dynamic Scope}%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{enumerate}[(a)]
+    \item static scope: 21
+    \item dynamic scope: 42
+\end{enumerate}
+The difference arises because of how $x$ is interpretted in each scheme. Using
+static scope, $f$ always interprets $x$ as 3 and $g$ always interprets $x$ as 4.
+Hence, evaluating $g~y$ yields $5 + 3 + 3 = 11$, evaluating $f~x$ yields
+$7 + 3$ ($x$ gets bound to 7 shortly before the $f~x$ expression), and evaluating
+their sum yields 21. Using dynamic scope, however, causes $f~x$ to evalute to
+$14$ because $f$ using the most recent $x = 7$ binding, and causes $g~y$ to
+evaluate to 28 because $g$ uses $x = 7$ during it's first invocation of $f$ and
+$x = 14$ during the second invocation. $f~x + g~y$ is then 42.
+
 \section{Mutual Fixpoints}%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 We solved this problem by first doing the karma and then instantiating our
 karma solution in the case where $n = 2$. Consequently, we'll present this
