@@ -63,7 +63,7 @@ let convert (e : exp) (s : state) : exp * state =
     | App (e0, e1) ->
       convert e0 s0 |> fun (e0', s1) ->
       convert e1 s1 |> fun (e1', s2) ->
-      (App (e0', e1), s2)
+      (App (e0', e1'), s2)
     | Let ([], _, _) -> failwith "invalid let expression"
     | Let (f::args, e1, e2) ->
       convert (App (Fun ([f], e2), Fun(args, e1))) s0
