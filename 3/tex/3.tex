@@ -1,14 +1,16 @@
 \documentclass[10pt]{article}
-\usepackage{fancyhdr}
+\usepackage{fancyhdr, amsmath, amssymb}
 \usepackage{enumerate}
 \usepackage{geometry}
 \usepackage{parskip}
 \usepackage{sectsty}
+\usepackage{mathpartir}
+
 
 % fancyhdr %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \pagestyle{fancy}
 
-\lhead{\sf CS 6110 Homework 2}
+\lhead{\sf CS 6110 Homework 3}
 \rhead{\sf Giang Nguyen (htn26) and Quinn Beightol (qeb2)}
 
 % sectsty %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -18,6 +20,20 @@
 
 \newcommand{\stepsTo}{\rightarrow}
 \newcommand{\multiStepsTo}{\stepsTo^*}
+\newcommand{\Rule}[3]{
+    \label{rule:#1}
+  \hfill
+  \ensuremath{\inferrule{#2}{#3}}
+  \hfill
+}
+\newcommand{\RuleWithCondition}[4]{
+  [\textsc{#1}]~
+  \label{rule:#1}
+  \hfill
+  \ensuremath{\inferrule{#2}{#3}}
+  (#4)
+  \hfill
+}
 
 % Document %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -116,10 +132,205 @@ and
 $$Y^2_1~F~G = G~(Y^2_1~F~G)~(Y^2_2~F~G) $$
 
 \section{State}%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{enumerate}
-    \item
-    \item
-    \item
+\begin{enumerate} [(a)]
+    \item $loc$ can be defined recursively as follows:
+    \begin{align*}
+      loc (l) &\triangleq \{l\}\\
+      loc (n) &\triangleq \varnothing\\  
+      loc (x) &\triangleq \varnothing\\
+      loc (\texttt{ref e}) &\triangleq loc(e)\\
+      loc (\texttt{!e}) &\triangleq loc(e)\\
+      loc (e_1 := e_2) &\triangleq loc(e_1) \cup loc(e_2)\\
+      loc (\texttt{null}) &\triangleq \varnothing\\
+      loc (\lambda x.e) &\triangleq loc(e)\\
+      loc (e_0;~e_1) &\triangleq loc(e_0) \cup loc(e_1)\\
+      loc (\texttt{let } x~=~e_1 \texttt{in } e_2) &\triangleq loc(e_1) \cup loc(e_2)\\
+      loc ((e_1, e_2)) &\triangleq loc(e_1) \cup loc(e_2)\\
+      loc (\#n~e) &\triangleq loc(e)
+    \end{align*}
+    \item 
+    \begin{align*}
+    &\langle \lambda x.((!l_1)~2)~(\texttt{ref 1}),~\{\}[l_1 \mapsto \lambda y. \texttt{ref y}]\rangle\\
+    \rightarrow &\langle \lambda x.((!l_1)~2)~l_2,~\{\}[l_1 \mapsto \lambda y. \texttt{ref y},~l_2 \mapsto 1]\rangle\\
+    \rightarrow &\langle (!l_1)~2, \{\}[l_1 \mapsto \lambda y. \texttt{ref y},~l_2 \mapsto 1]\rangle\\
+    \rightarrow &\langle (\lambda y.\texttt{ref y})~2,~\{\}[l_1 \mapsto \lambda y. \texttt{ref y},~l_2 \mapsto 1]\rangle\\
+    \rightarrow &\langle \texttt{ref 2},~\{\}[l_1 \mapsto \lambda y. \texttt{ref y},~l_2 \mapsto 1]\rangle\\
+    \rightarrow &\langle l_3,~\{\}[l_1 \mapsto \lambda y. \texttt{ref y},~l_2 \mapsto 1,~l_3 \mapsto 2]\rangle
+    \end{align*}
+    \item We will make use of evaluation contexts in this proof. To recap evaluation contexts can be defined for the fragment of the FL! language as follows:
+
+    \texttt{E ::= [.] | ref E | !E | E:= e | v:=E | E;e | v;E | E e | v E \\
+    | let x = E in e | let x = v in E | (E, e) | (v, E) | \#n E}
+
+    $loc$ can also be defined on evaluation contexts as follows:
+
+    \begin{align*}
+    loc([.]) &\triangleq \varnothing\\
+    loc(\texttt{ref E}) &\triangleq loc(E)\\
+    loc(!E) &\triangleq loc(E)\\
+    loc(E:=e) &\triangleq loc(E) \cup loc(e)\\
+    loc(v:=E) &\triangleq loc(v) \cup loc(E)\\
+    loc(E;e) &\triangleq loc(E) \cup loc(e)\\
+    loc(v;E) &\triangleq loc(v) \cup loc(E)\\
+    loc(E~e) &\triangleq loc(E)\cup loc(e)\\
+    loc(v~E) &\triangleq loc(v) \cup loc(E)\\
+    loc(\texttt{let x = E in e}) &\triangleq loc(E) \cup loc(e)\\
+    loc(\texttt{let x = v in E}) &\triangleq loc(v) \cup loc(E)\\
+    loc((E,e)) &\triangleq loc(E) \cup loc(e)\\
+    loc((v,E)) &\triangleq loc(v) \cup loc(E)\\
+    loc(\#n~E) &\triangleq loc(E)
+    \end{align*}
+
+    \textbf{Claim 1:} $loc(E[e]) = loc(E) \cup loc(e)$
+
+    \textbf{Proof:} This claim can be proved by induction on evaluation context $E$. 
+
+    \underline{Case 1}: $E = [.]$ then $loc(E[e]) = loc(e) = loc(e) \cup loc([.])$
+
+    In the following cases we assume that the claim holds for $E$ and prove it for $E'$.
+
+    \underline{Case 2}: $E = \texttt{ref E'}$
+
+    $loc(E[e]) = loc(\texttt{ref E'[e]}) = loc(E'[e]) = loc(E') \cup loc(e) = loc(E) \cup loc(e).$
+
+    \underline{Case 3}: $E = !E'$
+
+    $loc(E[e]) = loc(!E'[e]) = loc(E'[e]) = loc(E') \cup loc(e) = loc(E) \cup loc(e).$
+
+    \underline{Case 4}: $E = E':=e'$
+
+    $loc(E[e]) = loc(E'[e]:=e') = loc(E'[e]) \cup loc(e') = loc(E') \cup loc(e) \cup loc(e') = loc(E) \cup loc(e).$
+
+    \underline{Case 5}: $E = v:=E'$
+
+    $loc(E[e]) = loc(v:=E'[e]) = loc(v) \cup loc(E'[e]) = loc(v) \cup loc(E') \cup loc(e) = loc(E) \cup loc(e)$
+
+    \underline{Case 6}: $E = E';e'$
+
+    $loc(E[e]) = loc(E'[e];e') = loc(E'[e]) \cup loc(e')= loc(E') \cup loc(e) \cup loc(e') = loc(E) \cup loc(e)$
+
+    \underline{Case 7}: $E = v;E'$
+
+    $loc(E[e]) = loc(v;E'[e]) = loc(v) \cup loc(E'[e])= loc(v) \cup loc(E') \cup loc(e) = loc(E) \cup loc(e)$
+
+    \underline{Case 8}: $E = E'~e'$
+
+    $loc(E[e]) = loc(E'[e]~e') = loc(E'[e]) \cup loc(e')= loc(E') \cup loc(e) \cup loc(e')= loc(E) \cup loc(e)$
+
+    \underline{Case 9}: $E = v~E'$
+
+    $loc(E[e]) = loc(v~E'[e]) = loc(v) \cup loc(E'[e]) = loc(v) \cup loc(E') \cup loc(e)= loc(E) \cup loc(e)$
+
+    \underline{Case 10}: $E = \texttt{let x = E' in e'}$
+
+    $loc(E[e]) = loc(\texttt{let x = E'[e] in e'}) = loc(E'[e]) \cup loc(e') = loc(E') \cup loc(e) \cup loc(e')= loc(E) \cup loc(e)$
+
+    \underline{Case 11}: $E = \texttt{let x = v in E'}$
+
+    $loc(E[e]) = loc(\texttt{let x = v in E'[e]}) = loc(v) \cup loc(E'[e]) = loc(v) \cup loc(E') \cup loc(e) = loc(E) \cup loc(e)$
+
+    \underline{Case 12}: $E = (E',e')$
+
+    $loc(E[e]) = loc((E'[e], e')) = loc(E'[e]) \cup loc(e')= loc(E') \cup loc(e) \cup loc(e') = loc(E) \cup loc(e)$
+
+    \underline{Case 13}: $E = (v,E')$
+
+    $loc(E[e]) = loc((v,E'[e])) = loc(v) \cup loc(E'[e]) = loc(v) \cup loc(E') \cup loc(e) = loc(E) \cup loc(e)$
+
+    \underline{Case 14}: $E = \#n~E'$
+
+    $loc(E[e]) = loc(\#n~E'[e]) = loc(E'[e]) = loc(E') \cup loc(e) = loc(E) \cup loc(e).\Box$\\
+
+    \textbf{Claim 2:}  $\langle e, \sigma \rangle \rightarrow \langle e', \sigma' \rangle$ then $dom(\sigma) \subseteq dom(\sigma')$
+
+    \textbf{Proof:} This can be proved by inducting on induction rules. We first prove it for reduction rules followed by context rules.
+
+    \underline{Case 1}: $\langle \texttt{ref v}, \sigma \rangle \rightarrow \langle l, \sigma[v/l] \rangle,~l \notin dom(\sigma)$.
+
+    It's easy to see that $dom(\sigma[v/l]) = dom(\sigma) \cup \{l\} \supseteq dom(\sigma)$.
+
+    \underline{Case 2}: $\langle l~:=~v, \sigma \rangle \rightarrow \langle \texttt{null}, \sigma[v/l] \rangle,~l \in dom(\sigma)$.
+
+    In this case $dom(\sigma[v/l]) = dom(\sigma) \cup \{l\} = dom(\sigma)$.
+
+    \underline{Case 3}:  Other reduction rules:
+
+    $\langle !l, \sigma \rangle \rightarrow \langle \sigma(l), \sigma\rangle$.
+    
+    $\langle v;e, \sigma \rangle \rightarrow \langle e, \sigma \rangle$.
+
+    $\langle (\lambda x.e)~v, \sigma \rangle \rightarrow \langle e\{v/x\}, \sigma \rangle$.
+
+    $\langle \texttt{let x = v in e}, \sigma \rangle \rightarrow \langle e\{v/x\}, \sigma \rangle$.
+
+    $\langle \#1(v_1, v_2), \sigma \rangle \rightarrow \langle v_1, \sigma \rangle$.
+
+    $\langle \#2(v_1, v_2), \sigma \rangle \rightarrow \langle v_2, \sigma \rangle$.
+
+    $\langle \#n(v_1, v_2), \sigma \rangle \rightarrow \langle \#(n-1)v_2, \sigma \rangle$.
+
+    In the rules above, the store does not change as the expression steps so the claim holds automatically.
+
+    \underline{Case 4}: Context rule:
+
+    \Rule{}{
+    \langle e, \sigma \rangle \rightarrow \langle e', \sigma' \rangle
+  }{
+    \langle E[e], \sigma \rangle \rightarrow \langle E[e'], \sigma' \rangle
+  } \\*
+
+    By the induction hypothesis $\langle e, \sigma \rangle \rightarrow \langle e', \sigma' \rangle$ so $dom(\sigma) \subseteq dom(\sigma')$.$\Box$.\\
+
+    \textbf{Claim 3}: If $\langle e, \sigma \rangle \rightarrow \langle e', \sigma' \rangle$ and $loc(e) \subseteq dom(\sigma)$ then $loc(e') \subseteq dom(\sigma')$
+
+    \textbf{Proof}: We will use induction on the derivation of $\langle e, \sigma \rangle \rightarrow \langle e', \sigma' \rangle$. The relation used in this induction proof is the evaluation tree of $\langle e, \sigma \rangle \rightarrow \langle e', \sigma' \rangle$. This is well founded since such a tree is always finite.
+
+    The proof first consider reduction rules and then the context rule.
+
+    \underline{Case 1}: $\langle \texttt{ref v}, \sigma \rangle \rightarrow \langle l, \sigma[v/l] \rangle,~l \notin dom(\sigma)$.
+
+    It's easy to see that $l \in dom(\sigma) \cup \{l\} = dom(\sigma[v/l])$
+
+    \underline{Case 2}: $\langle l~:=~v, \sigma \rangle \rightarrow \langle \texttt{null}, \sigma[v/l] \rangle,~l \in dom(\sigma)$.
+
+    In this case $dom(\sigma[v/l]) = dom(\sigma) \cup \{l\} = dom(\sigma)$.
+
+    \underline{Case 3}: $\langle !l, \sigma \rangle \rightarrow \langle \sigma(l), \sigma\rangle$.
+
+    %TODO:
+    \underline{Case 4}: $\langle v;e, \sigma \rangle \rightarrow \langle e, \sigma \rangle$.
+
+    It's obvious that $loc(e) \subseteq loc(e;v) \subseteq dom(\sigma)$.
+
+    \underline{Case 5}: Other reduction rules do not change the store and the locations in the expression stepped into is a subset of locations in the initial expression so we can safely conclude that the claim holds here as well.
+
+    $\langle (\lambda x.e)~v, \sigma \rangle \rightarrow \langle e\{v/x\}, \sigma \rangle$.
+
+    $\langle \texttt{let x = v in e}, \sigma \rangle \rightarrow \langle e\{v/x\}, \sigma \rangle$.
+
+    $\langle \#1(v_1, v_2), \sigma \rangle \rightarrow \langle v_1, \sigma \rangle$.
+
+    $\langle \#2(v_1, v_2), \sigma \rangle \rightarrow \langle v_2, \sigma \rangle$.
+
+    $\langle \#n(v_1, v_2), \sigma \rangle \rightarrow \langle \#(n-1)v_2, \sigma \rangle$.
+
+    \underline{Case 6}: The case of context rule can be proved using claim 1 and 2 above.
+
+    \Rule{}{
+    \langle e, \sigma \rangle \rightarrow \langle e', \sigma' \rangle
+  }{
+    \langle E[e], \sigma \rangle \rightarrow \langle E[e'], \sigma' \rangle
+  } \\*
+
+    By assumption $loc(E[e]) \subseteq dom(\sigma) \Rightarrow loc(e) \subseteq dom(\sigma)$ since $loc(e) \subseteq loc (E[e])$. Then by induction hypothesis $loc(e') \subseteq dom(\sigma')$.
+
+    Since $loc(E[e']) = loc(E) \cup loc(e')$ and $loc(E) \subseteq dom(\sigma) \subseteq dom(\sigma')$ we conclude that $loc(E[e']) \subseteq dom(\sigma')\Box$.\\
+
+    The fact in the question is an immediate consequence of claim 3. Suppose $\langle e, \{\} \rangle$ steps to $\langle e', \sigma \rangle$ after a number of steps. 
+
+    Let the intermediate expressions and stores be $\langle e, \{\} \rangle \rightarrow \langle e_1, \sigma_1 \rangle \rightarrow \langle e_2, \sigma_2 \rangle \rightarrow \ldots \rightarrow \langle e_n, \sigma_n \rangle \rightarrow \langle e_1, \sigma_1 \rangle$
+
+    Then since $e$ is a valid program $loc(e) = \varnothing \subseteq \{\}$. By applying claim 3 repeatedly we have $loc(e_1) \subseteq dom(\sigma_1) \Rightarrow loc(e_2) \subseteq dom(\sigma_2) \Rightarrow \ldots \Rightarrow loc(e_n) \subseteq dom(\sigma_n) \Rightarrow loc(e') \subseteq dom(\sigma). \Box$
 \end{enumerate}
 \section{Control Flow}%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{enumerate}
