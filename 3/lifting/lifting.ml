@@ -70,16 +70,19 @@ let convert (e : exp) (s : state) : exp * state =
     | Letrec ([], _, _) -> failwith "invalid let rec expression"
     | Letrec (f::args, e1, e2) ->
       let desugared_f_def = Fun (args, e1) in
-      let new_args = HashSet.values (fv desugared_f_def) in
-      let f_app_to_new_args = apply_to_all (Var f) new_args in
+      let desugared_f_def_fvs = fv desugared_f_def in
+      HashSet.remove desugared_f_def_fvs f;
+      let new_args = HashSet.values desugared_f_def_fvs in
+      let new_f_name = Fresh.next var_gen in
+      let new_f_app_to_new_args = apply_to_all (Var new_f_name) new_args in
       (* the desugared_f_body with f new_args subsituted in for f (so that
        * recursive calls to f work). *)
-      let fixed_desugard_f_def = subst f_app_to_new_args f desugared_f_def in
-      let s0_with_f_bound_to_err = update s0 f Error in
-      let final_f_def, s1 = convert fixed_desugard_f_def s0_with_f_bound_to_err in
+      let fixed_desugard_f_def = subst new_f_app_to_new_args f desugared_f_def in
+      let final_f_def, s1 = convert fixed_desugard_f_def s0 in
       let final_f = Fun (new_args, final_f_def) in
-      let (_, final_f_state) = rec_update (Closure (final_f, State.update s1 f Error)) in
-      convert e2 final_f_state
+      let (_, final_f_state) = rec_update (Closure (final_f, State.update s1 new_f_name Error)) in
+      let e2_with_updated_f_calls = subst new_f_app_to_new_args f e2 in
+      convert e2_with_updated_f_calls final_f_state
     | Cond (b, e1, e2) ->
       let (b', s1) = convert b s0 in
       let (e1', s2) = convert e1 s1 in
@@ -134,9 +137,10 @@ let convert (e : exp) (s : state) : exp * state =
 let rec to_expr bs e = match bs with
   | [] -> e
   | (x, (Closure (Fun _ as f, s)))::tl ->
-    if bindings s == [] then Let ([x], f, to_expr tl e)
-    else Letrec ([x], f, to_expr tl e)
-  | _ -> failwith "bindings held something other than a closure"
+    if bindings s == [] then to_expr tl (Let ([x], f, e))
+    else to_expr tl (Letrec ([x], f, e))
+  | (x, v)::_ ->
+    failwith ("bindings held something other than a function" ^ State.to_string v)
 
 (* let rec to_expr bindings e = match bindings with
   | [] -> e
