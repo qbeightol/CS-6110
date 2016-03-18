@@ -66,7 +66,7 @@ let convert (e : exp) (s : state) : exp * state =
       (App (e0', e1), s2)
     | Let ([], _, _) -> failwith "invalid let expression"
     | Let (f::args, e1, e2) ->
-      convert (App (Fun ([f], e1), Fun(args, e2))) s0
+      convert (App (Fun ([f], e2), Fun(args, e1))) s0
     | Letrec ([], _, _) -> failwith "invalid let rec expression"
     | Letrec (f::args, e1, e2) ->
       let desugared_f_def = Fun (args, e1) in
