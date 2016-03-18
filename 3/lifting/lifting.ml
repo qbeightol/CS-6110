@@ -40,10 +40,17 @@ let rec is_target_prog (e : exp) : bool =
 let convert (e : exp) (s : state) : exp * state =
   let e_vars = allv e in
   let var_gen = Fresh.make e_vars in
-  let rec apply_to_all_expr e xs = match xs with
+  let rec apply_to_all e xs = match xs with
     | []     -> e
-    | hd::tl -> apply_to_all_expr (App (e, Var hd)) tl
+    | hd::tl -> apply_to_all (App (e, Var hd)) tl
   in
+
+  (* The output store ought to be a mapping from function names to closures
+   * where the closure's environment is [] when f is function that should be
+   * converted to a regular let binding, or env = [f ↦ (λ args. body, env)]
+   * when f should be translated into a recursive let (i.e. it's environment
+   * is the output of a call to rec_update. )
+   *)
   let rec convert e s0 =
     match e with
     | Var _ -> (e, s0)
@@ -52,28 +59,76 @@ let convert (e : exp) (s : state) : exp * state =
       let e_fvs = HashSet.values (fv e) in
       let f = Fresh.next var_gen in
       let s2 = update s1 f (Closure (Fun (e_fvs@args, body'), State.make ())) in
-      (apply_to_all_expr (Var f) e_fvs, s2)
+      (apply_to_all (Var f) e_fvs, s2)
+    | App (e0, e1) ->
+      convert e0 s0 |> fun (e0', s1) ->
+      convert e1 s1 |> fun (e1', s2) ->
+      (App (e0', e1), s2)
+    | Let ([], _, _) -> failwith "invalid let expression"
     | Let (f::args, e1, e2) ->
-      convert (Fun (args, e1)) s0  |> fun (e1', s1) ->
-      convert e2 s1  |> fun (e2', s2) ->
-      let g = Fresh.next var_gen in
-      let e2_fvs = HashSet.values (fv e2) in
-      let s3 = update s2 g (Closure (Fun (f::e2_fvs, e2'), State.make ())) in
-      (* todo pass environment args into g *)
-      (App (Var g, e1'), s3)
+      convert (App (Fun ([f], e1), Fun(args, e2))) s0
+    | Letrec ([], _, _) -> failwith "invalid let rec expression"
     | Letrec (f::args, e1, e2) ->
-      convert (Fun (args, e1)) s0  |> fun (e1', s1) ->
-      convert e2 s1  |> fun (e2', s2) ->
-      let g = Fresh.next var_gen in
-      let e2_fvs = HashSet.values (fv e2) in
-      let s3 = update s2 g (Closure (Fun (f::e2_fvs, e2'), State.make ())) in
-      (* todo pass environment args into g *)
-      (App (Var g, e1'), s3)
-    | App (e1, e2) ->
-      convert e1 s0 |> fun (e1', s1) ->
-      convert e2 s1 |> fun (e2', s2) ->
-      (App (e1', e2), s2)
-    | _ -> failwith "not implementend"
+      let desugared_f_def = Fun (args, e1) in
+      let new_args = HashSet.values (fv desugared_f_def) in
+      let f_app_to_new_args = apply_to_all (Var f) new_args in
+      (* the desugared_f_body with f new_args subsituted in for f (so that
+       * recursive calls to f work). *)
+      let fixed_desugard_f_def = subst f_app_to_new_args f desugared_f_def in
+      let s0_with_f_bound_to_err = update s0 f Error in
+      let final_f_def, s1 = convert fixed_desugard_f_def s0_with_f_bound_to_err in
+      let final_f = Fun (new_args, final_f_def) in
+      let (_, final_f_state) = rec_update (Closure (final_f, State.update s1 f Error)) in
+      convert e2 final_f_state
+    | Cond (b, e1, e2) ->
+      let (b', s1) = convert b s0 in
+      let (e1', s2) = convert e1 s1 in
+      let (e2', s3) = convert e2 s2 in
+      Cond (b', e1', e2'), s3
+    | Num n  -> Num n, s0
+    (* warning: this is really dumb *)
+    | Plus (l, r)  ->
+      let (l', s1) = convert l s0 in
+      let (r', s2) = convert r s1 in
+      Plus (l', r'), s2
+    | Minus (l, r) ->
+      let (l', s1) = convert l s0 in
+      let (r', s2) = convert r s1 in
+      Minus (l', r'), s2
+    | Times (l, r) ->
+      let (l', s1) = convert l s0 in
+      let (r', s2) = convert r s1 in
+      Times (l', r'), s2
+    | Div (l, r) ->
+      let (l', s1) = convert l s0 in
+      let (r', s2) = convert r s1 in
+      Div (l', r'), s2
+    | Mod (l, r) ->
+      let (l', s1) = convert l s0 in
+      let (r', s2) = convert r s1 in
+      Mod (l', r'), s2
+    | And (l, r) ->
+      let (l', s1) = convert l s0 in
+      let (r', s2) = convert r s1 in
+      And (l', r'), s2
+    | Or (l, r) ->
+      let (l', s1) = convert l s0 in
+      let (r', s2) = convert r s1 in
+      Or (l', r'), s2
+    | Not b -> Not b, s0
+    | Eq (l, r) ->
+      let (l', s1) = convert l s0 in
+      let (r', s2) = convert r s1 in
+      Eq (l', r'), s2
+    | Leq (l, r) ->
+      let (l', s1) = convert l s0 in
+      let (r', s2) = convert r s1 in
+      Leq (l', r'), s2
+    | Lt (l, r) ->
+      let (l', s1) = convert l s0 in
+      let (r', s2) = convert r s1 in
+      Lt (l', r'), s2
+    | Bool b -> Bool b, s0
   in convert e s
 
 let rec to_expr bs e = match bs with
