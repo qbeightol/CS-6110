@@ -1,7 +1,7 @@
 (* read-eval-print loop *)
 
-Printexc.record_backtrace true
-let cDEBUG = true
+(* Printexc.record_backtrace true *)
+let cDEBUG = false
 
 exception Quit
 
