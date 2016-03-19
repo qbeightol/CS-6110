@@ -1,5 +1,5 @@
 \documentclass[10pt]{article}
-\usepackage{fancyhdr, amsmath, amssymb}
+\usepackage{fancyhdr, amsmath, amssymb, stmaryrd}
 \usepackage{enumerate}
 \usepackage{geometry}
 \usepackage{parskip}
@@ -27,7 +27,6 @@
   \hfill
 }
 \newcommand{\RuleWithCondition}[4]{
-  [\textsc{#1}]~
   \label{rule:#1}
   \hfill
   \ensuremath{\inferrule{#2}{#3}}
@@ -281,28 +280,50 @@ $$Y^2_1~F~G = G~(Y^2_1~F~G)~(Y^2_2~F~G) $$
 
     By the induction hypothesis $\langle e, \sigma \rangle \rightarrow \langle e', \sigma' \rangle$ so $dom(\sigma) \subseteq dom(\sigma')$.$\Box$.\\
 
-    \textbf{Claim 3}: If $\langle e, \sigma \rangle \rightarrow \langle e', \sigma' \rangle$ and $loc(e) \subseteq dom(\sigma)$ then $loc(e') \subseteq dom(\sigma')$
+    \textbf{Claim 3}: If $\langle e, \sigma \rangle \rightarrow \langle e', \sigma' \rangle$ and the following 2 conditions hold for $\langle e, \sigma \rangle$: 
+
+    $loc(e) \subseteq dom(\sigma)$ and $\forall l \in dom(\sigma),~loc(\sigma(l)) \subseteq dom(\sigma)$
+
+    then those 2 conditions also hold for $\langle e', \sigma' \rangle$, that is \\
+    $loc(e') \subseteq dom(\sigma')$ and $\forall l \in dom(\sigma')~loc(\sigma'(l)) \subseteq dom(\sigma')$.
 
     \textbf{Proof}: We will use induction on the derivation of $\langle e, \sigma \rangle \rightarrow \langle e', \sigma' \rangle$. The relation used in this induction proof is the evaluation tree of $\langle e, \sigma \rangle \rightarrow \langle e', \sigma' \rangle$. This is well founded since such a tree is always finite.
 
-    The proof first consider reduction rules and then the context rule.
+    The proof first consider reduction rules and followed by the context rule.
 
     \underline{Case 1}: $\langle \texttt{ref v}, \sigma \rangle \rightarrow \langle l, \sigma[v/l] \rangle,~l \notin dom(\sigma)$.
 
-    It's easy to see that $l \in dom(\sigma) \cup \{l\} = dom(\sigma[v/l])$
+    It's easy to see that $l \in dom(\sigma) \cup \{l\} = dom(\sigma[v/l])$.
+
+    Let $l'$ be an arbitrary location in $dom(\sigma[v/l])$. 
+
+    If $l' \neq l$ then $l' \in dom(\sigma)$. By the induction hypothesis $loc(\sigma(l')) \subseteq dom(\sigma) \subseteq dom(\sigma[v/l])$.
+
+    If $l' = l$ then $loc(\sigma[v/l](l)) = loc(v) \subseteq dom(\sigma) \subseteq dom(\sigma[v/l]).$
 
     \underline{Case 2}: $\langle l~:=~v, \sigma \rangle \rightarrow \langle \texttt{null}, \sigma[v/l] \rangle,~l \in dom(\sigma)$.
 
-    In this case $dom(\sigma[v/l]) = dom(\sigma) \cup \{l\} = dom(\sigma)$.
+    $loc(\texttt{null}) = \varnothing \subseteq dom(\sigma[v/l])$
+
+    Let $l'$ be an arbitrary location in $dom(\sigma[v/l])$. 
+
+    If $l' \neq l$ then by the induction hypothesis $loc(\sigma[v/l](l'))  = loc(\sigma(l')) \subseteq dom(\sigma) = dom(\sigma[v/l])$.
+
+    If $l' = l$ then $loc(\sigma[v/l](l)) = loc(v) \subseteq dom(\sigma) = dom(\sigma[v/l]).$    
 
     \underline{Case 3}: $\langle !l, \sigma \rangle \rightarrow \langle \sigma(l), \sigma\rangle$.
 
-    %TODO:
+    Since $l \in dom(\sigma)$ by induction hypothesis $loc(\sigma(l)) \subseteq dom(\sigma)$.
+
+    On the other hand since the store does not change so if $l' \in dom(sigma)$ then $loc(\sigma(l')) \subseteq dom(\sigma).$
+
     \underline{Case 4}: $\langle v;e, \sigma \rangle \rightarrow \langle e, \sigma \rangle$.
 
     It's obvious that $loc(e) \subseteq loc(e;v) \subseteq dom(\sigma)$.
 
-    \underline{Case 5}: Other reduction rules do not change the store and the locations in the expression stepped into is a subset of locations in the initial expression so we can safely conclude that the claim holds here as well.
+    Again the store does not change so if $l' \in dom(sigma)$ then $loc(\sigma(l')) \subseteq dom(\sigma).$
+
+    \underline{Case 5}: Other reduction rules do not change the store. We claim that the locations in the expression stepped into are a subset of locations in the initial expression. This way we can safely conclude that the claim holds here as well.
 
     $\langle (\lambda x.e)~v, \sigma \rangle \rightarrow \langle e\{v/x\}, \sigma \rangle$.
 
@@ -333,19 +354,46 @@ $$Y^2_1~F~G = G~(Y^2_1~F~G)~(Y^2_2~F~G) $$
     Then since $e$ is a valid program $loc(e) = \varnothing \subseteq \{\}$. By applying claim 3 repeatedly we have $loc(e_1) \subseteq dom(\sigma_1) \Rightarrow loc(e_2) \subseteq dom(\sigma_2) \Rightarrow \ldots \Rightarrow loc(e_n) \subseteq dom(\sigma_n) \Rightarrow loc(e') \subseteq dom(\sigma). \Box$
 \end{enumerate}
 \section{Control Flow}%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{enumerate}
-    \item
-    \item
-    \item
-\end{enumerate}
+\begin{enumerate} [(a)]
+    \item We define values in this extension of FL! as follows:
+
+    $v ::= ... | \texttt{abort e}$
+
+    The big step semantics $\Downarrow \in \texttt{Exp} \times \texttt{Env} \rightarrow \texttt{Value} \times \texttt{Env}$ for the extension part of the language can be defined as follows:
+
+  \RuleWithCondition{}{
+    \langle e, \sigma \rangle \Downarrow \langle v, \sigma' \rangle
+  }{
+    \langle \texttt{transaction e}, \sigma \rangle \Downarrow \langle v, \sigma' \rangle
+  }{$v \neq \texttt{abort e'}$} \\*
+
+  \Rule{}{
+    \langle e, \sigma \rangle \Downarrow \langle \texttt{abort e'}, \sigma' \rangle ~, ~ \langle e', \sigma \rangle \Downarrow \langle v, \sigma'' \rangle
+  }{
+    \langle \texttt{transaction e}, \sigma \rangle \Downarrow \langle v, \sigma'' \rangle
+  } \\*
+    \item In order to translate the extended language into FL we will use the store concept in FL!. In FL! each expression is evaluated given a particular store but in this extended language we will use a list of stores which can be recursively defined as a tuple of a store and a stack (list) of stores. The empty stack is equivalent to $(\texttt{null}, \texttt{null})$. The current working store is on the top of the stack.
+
+    Let $\llbracket . \rrbracket_1$ be the translation from FL! to FL. We will define $\llbracket . \rrbracket_1$, the translation from the extended language to FL. Denote $\overline{\sigma}$ as a list of stores so $\# 1 \overline{\sigma}$ returns the head of the list and $\# 2 \overline{\sigma}$ is the tail.
+    \begin{align*}
+    \llbracket \texttt{transaction e}\rrbracket~\rho~\overline{\sigma} &\triangleq \llbracket e\rrbracket~\rho~(\#1 \overline{\sigma}, \overline{\sigma})\\
+    \llbracket \texttt{abort e}\rrbracket~\rho~\overline{\sigma} &\triangleq \llbracket e\rrbracket~\rho~(\#2 \overline{\sigma})\\
+    \text{For other expressions }&\text{that are not transaction nor abort:}\\
+    \llbracket e\rrbracket~\rho~\overline{\sigma} &\triangleq \texttt{let (x,y) = }\llbracket e\rrbracket_1~\rho~(\#1 \overline{\sigma}) \texttt{ in } (x, (y, \# 2 \overline{\sigma}))
+    \end{align*}
+    The idea is that when evaluating \texttt{transaction e} we will push the current store onto the top of the list and continue evaluating $e$ in the current store. For \texttt{abort e} we will remove the first store in the list and $e$ will be evaluated in the next store since this is the store of the latest transaction.
+    \item We decided to add \texttt{abort e} as one of the values so that when using the big step semantics we are able to evaluate $e$ in the original store.
+
+    Another design choice is made when $\langle \texttt{transaction e}, \sigma \rangle$ is evaluated to $\langle \texttt{abort e'}, \sigma' \langle$ at this point we choose to revert back to the store at the beginning of the transaction ($\sigma$) and evaluate $e'$ in this store to $\langle v, \sigma'' \rangle$. The entire transaction then returns the value of $e'$ together with the store resulted from the evaluation of $e'$ in $\sigma$, that is $\langle v, \sigma'' \rangle$. This choice shows up in the translation to FL when a store is popped from the stack of stores when an expression is evaluated to \texttt{abort e} and at this point the working store which is on the top of the stack is the store at the beginning of the transaction.
+    \end{enumerate}
 \section{Closure Conversion}%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 See \texttt{lifting.zip}.
 \section{Debriefing}%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{enumerate}
-    \item
-    \item
-    \item
-    \item
+    \item About 40 hours in total.
+    \item Somewhere between moderate and difficult.
+    \item Yes, both partners participated.
+    \item 95\%
     \item
 \end{enumerate}
 \end{document}
