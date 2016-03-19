@@ -135,7 +135,7 @@ $$Y^2_1~F~G = G~(Y^2_1~F~G)~(Y^2_2~F~G) $$
     \item $loc$ can be defined recursively as follows:
     \begin{align*}
       loc (l) &\triangleq \{l\}\\
-      loc (n) &\triangleq \varnothing\\  
+      loc (n) &\triangleq \varnothing\\
       loc (x) &\triangleq \varnothing\\
       loc (\texttt{ref e}) &\triangleq loc(e)\\
       loc (\texttt{!e}) &\triangleq loc(e)\\
@@ -147,7 +147,7 @@ $$Y^2_1~F~G = G~(Y^2_1~F~G)~(Y^2_2~F~G) $$
       loc ((e_1, e_2)) &\triangleq loc(e_1) \cup loc(e_2)\\
       loc (\#n~e) &\triangleq loc(e)
     \end{align*}
-    \item 
+    \item
     \begin{align*}
     &\langle \lambda x.((!l_1)~2)~(\texttt{ref 1}),~\{\}[l_1 \mapsto \lambda y. \texttt{ref y}]\rangle\\
     \rightarrow &\langle \lambda x.((!l_1)~2)~l_2,~\{\}[l_1 \mapsto \lambda y. \texttt{ref y},~l_2 \mapsto 1]\rangle\\
@@ -182,7 +182,7 @@ $$Y^2_1~F~G = G~(Y^2_1~F~G)~(Y^2_2~F~G) $$
 
     \textbf{Claim 1:} $loc(E[e]) = loc(E) \cup loc(e)$
 
-    \textbf{Proof:} This claim can be proved by induction on evaluation context $E$. 
+    \textbf{Proof:} This claim can be proved by induction on evaluation context $E$.
 
     \underline{Case 1}: $E = [.]$ then $loc(E[e]) = loc(e) = loc(e) \cup loc([.])$
 
@@ -242,7 +242,7 @@ $$Y^2_1~F~G = G~(Y^2_1~F~G)~(Y^2_2~F~G) $$
 
     \textbf{Claim 2:}  $\langle e, \sigma \rangle \rightarrow \langle e', \sigma' \rangle$ then $dom(\sigma) \subseteq dom(\sigma')$
 
-    \textbf{Proof:} This can be proved by inducting on induction rules. We first prove it for reduction rules followed by context rules.
+    \textbf{Proof:} This can be proved by inducting on the derivation of $\langle e, \sigma \rangle \rightarrow \langle e', \sigma' \rangle$. We first prove it for reduction rules followed by context rules.
 
     \underline{Case 1}: $\langle \texttt{ref v}, \sigma \rangle \rightarrow \langle l, \sigma[v/l] \rangle,~l \notin dom(\sigma)$.
 
@@ -255,7 +255,7 @@ $$Y^2_1~F~G = G~(Y^2_1~F~G)~(Y^2_2~F~G) $$
     \underline{Case 3}:  Other reduction rules:
 
     $\langle !l, \sigma \rangle \rightarrow \langle \sigma(l), \sigma\rangle$.
-    
+
     $\langle v;e, \sigma \rangle \rightarrow \langle e, \sigma \rangle$.
 
     $\langle (\lambda x.e)~v, \sigma \rangle \rightarrow \langle e\{v/x\}, \sigma \rangle$.
@@ -280,7 +280,7 @@ $$Y^2_1~F~G = G~(Y^2_1~F~G)~(Y^2_2~F~G) $$
 
     By the induction hypothesis $\langle e, \sigma \rangle \rightarrow \langle e', \sigma' \rangle$ so $dom(\sigma) \subseteq dom(\sigma')$.$\Box$.\\
 
-    \textbf{Claim 3}: If $\langle e, \sigma \rangle \rightarrow \langle e', \sigma' \rangle$ and the following 2 conditions hold for $\langle e, \sigma \rangle$: 
+    \textbf{Claim 3}: If $\langle e, \sigma \rangle \rightarrow \langle e', \sigma' \rangle$ and the following 2 conditions hold for $\langle e, \sigma \rangle$:
 
     $loc(e) \subseteq dom(\sigma)$ and $\forall l \in dom(\sigma),~loc(\sigma(l)) \subseteq dom(\sigma)$
 
@@ -295,7 +295,7 @@ $$Y^2_1~F~G = G~(Y^2_1~F~G)~(Y^2_2~F~G) $$
 
     It's easy to see that $l \in dom(\sigma) \cup \{l\} = dom(\sigma[v/l])$.
 
-    Let $l'$ be an arbitrary location in $dom(\sigma[v/l])$. 
+    Let $l'$ be an arbitrary location in $dom(\sigma[v/l])$.
 
     If $l' \neq l$ then $l' \in dom(\sigma)$. By the induction hypothesis $loc(\sigma(l')) \subseteq dom(\sigma) \subseteq dom(\sigma[v/l])$.
 
@@ -305,11 +305,11 @@ $$Y^2_1~F~G = G~(Y^2_1~F~G)~(Y^2_2~F~G) $$
 
     $loc(\texttt{null}) = \varnothing \subseteq dom(\sigma[v/l])$
 
-    Let $l'$ be an arbitrary location in $dom(\sigma[v/l])$. 
+    Let $l'$ be an arbitrary location in $dom(\sigma[v/l])$.
 
     If $l' \neq l$ then by the induction hypothesis $loc(\sigma[v/l](l'))  = loc(\sigma(l')) \subseteq dom(\sigma) = dom(\sigma[v/l])$.
 
-    If $l' = l$ then $loc(\sigma[v/l](l)) = loc(v) \subseteq dom(\sigma) = dom(\sigma[v/l]).$    
+    If $l' = l$ then $loc(\sigma[v/l](l)) = loc(v) \subseteq dom(\sigma) = dom(\sigma[v/l]).$
 
     \underline{Case 3}: $\langle !l, \sigma \rangle \rightarrow \langle \sigma(l), \sigma\rangle$.
 
@@ -347,7 +347,7 @@ $$Y^2_1~F~G = G~(Y^2_1~F~G)~(Y^2_2~F~G) $$
 
     Since $loc(E[e']) = loc(E) \cup loc(e')$ and $loc(E) \subseteq dom(\sigma) \subseteq dom(\sigma')$ we conclude that $loc(E[e']) \subseteq dom(\sigma')\Box$.\\
 
-    The fact in the question is an immediate consequence of claim 3. Suppose $\langle e, \{\} \rangle$ steps to $\langle e', \sigma \rangle$ after a number of steps. 
+    The fact in the question is an immediate consequence of claim 3. Suppose $\langle e, \{\} \rangle$ steps to $\langle e', \sigma \rangle$ after a number of steps.
 
     Let the intermediate expressions and stores be $\langle e, \{\} \rangle \rightarrow \langle e_1, \sigma_1 \rangle \rightarrow \langle e_2, \sigma_2 \rangle \rightarrow \ldots \rightarrow \langle e_n, \sigma_n \rangle \rightarrow \langle e_1, \sigma_1 \rangle$
 
@@ -368,13 +368,14 @@ $$Y^2_1~F~G = G~(Y^2_1~F~G)~(Y^2_2~F~G) $$
   }{$v \neq \texttt{abort e'}$} \\*
 
   \Rule{}{
-    \langle e, \sigma \rangle \Downarrow \langle \texttt{abort e'}, \sigma' \rangle ~, ~ \langle e', \sigma \rangle \Downarrow \langle v, \sigma'' \rangle
+    \langle e, \sigma \rangle \Downarrow \langle \texttt{abort e'}, \sigma' \rangle \\
+    \langle e', \sigma \rangle \Downarrow \langle v, \sigma'' \rangle
   }{
     \langle \texttt{transaction e}, \sigma \rangle \Downarrow \langle v, \sigma'' \rangle
   } \\*
     \item In order to translate the extended language into FL we will use the store concept in FL!. In FL! each expression is evaluated given a particular store but in this extended language we will use a list of stores which can be recursively defined as a tuple of a store and a stack (list) of stores. The empty stack is equivalent to $(\texttt{null}, \texttt{null})$. The current working store is on the top of the stack.
 
-    Let $\llbracket . \rrbracket_1$ be the translation from FL! to FL. We will define $\llbracket . \rrbracket_1$, the translation from the extended language to FL. Denote $\overline{\sigma}$ as a list of stores so $\# 1 \overline{\sigma}$ returns the head of the list and $\# 2 \overline{\sigma}$ is the tail.
+    Let $\llbracket \cdot \rrbracket_1$ be the translation from FL! to FL. We will define $\llbracket \cdot \rrbracket$, the translation from the extended language to FL. Denote $\overline{\sigma}$ as a list of stores so $\# 1 \overline{\sigma}$ returns the head of the list and $\# 2 \overline{\sigma}$ is the tail.
     \begin{align*}
     \llbracket \texttt{transaction e}\rrbracket~\rho~\overline{\sigma} &\triangleq \llbracket e\rrbracket~\rho~(\#1 \overline{\sigma}, \overline{\sigma})\\
     \llbracket \texttt{abort e}\rrbracket~\rho~\overline{\sigma} &\triangleq \llbracket e\rrbracket~\rho~(\#2 \overline{\sigma})\\
@@ -384,7 +385,7 @@ $$Y^2_1~F~G = G~(Y^2_1~F~G)~(Y^2_2~F~G) $$
     The idea is that when evaluating \texttt{transaction e} we will push the current store onto the top of the list and continue evaluating $e$ in the current store. For \texttt{abort e} we will remove the first store in the list and $e$ will be evaluated in the next store since this is the store of the latest transaction.
     \item We decided to add \texttt{abort e} as one of the values so that when using the big step semantics we are able to evaluate $e$ in the original store.
 
-    Another design choice is made when $\langle \texttt{transaction e}, \sigma \rangle$ is evaluated to $\langle \texttt{abort e'}, \sigma' \langle$ at this point we choose to revert back to the store at the beginning of the transaction ($\sigma$) and evaluate $e'$ in this store to $\langle v, \sigma'' \rangle$. The entire transaction then returns the value of $e'$ together with the store resulted from the evaluation of $e'$ in $\sigma$, that is $\langle v, \sigma'' \rangle$. This choice shows up in the translation to FL when a store is popped from the stack of stores when an expression is evaluated to \texttt{abort e} and at this point the working store which is on the top of the stack is the store at the beginning of the transaction.
+    Another design choice is made when $\langle \texttt{transaction e}, \sigma \rangle$ is evaluated to $\langle \texttt{abort e'}, \sigma' \rangle$ at this point we choose to revert back to the store at the beginning of the transaction ($\sigma$) and evaluate $e'$ in this store to $\langle v, \sigma'' \rangle$. The entire transaction then returns the value of $e'$ together with the store resulted from the evaluation of $e'$ in $\sigma$, that is $\langle v, \sigma'' \rangle$. This choice shows up in the translation to FL when a store is popped from the stack of stores when an expression is evaluated to \texttt{abort e} and at this point the working store which is on the top of the stack is the store at the beginning of the transaction.
     \end{enumerate}
 \section{Closure Conversion}%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 See \texttt{lifting.zip}.
