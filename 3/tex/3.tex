@@ -377,10 +377,31 @@ $$Y^2_1~F~G = G~(Y^2_1~F~G)~(Y^2_2~F~G) $$
 
     Let $\llbracket \cdot \rrbracket_1$ be the translation from FL! to FL. We will define $\llbracket \cdot \rrbracket$, the translation from the extended language to FL. Denote $\overline{\sigma}$ as a list of stores so $\# 1 \overline{\sigma}$ returns the head of the list and $\# 2 \overline{\sigma}$ is the tail.
     \begin{align*}
-    \llbracket \texttt{transaction e}\rrbracket~\rho~\overline{\sigma} &\triangleq \llbracket e\rrbracket~\rho~(\#1 \overline{\sigma}, \overline{\sigma})\\
-    \llbracket \texttt{abort e}\rrbracket~\rho~\overline{\sigma} &\triangleq \llbracket e\rrbracket~\rho~(\#2 \overline{\sigma})\\
-    \text{For other expressions }&\text{that are not transaction nor abort:}\\
-    \llbracket e\rrbracket~\rho~\overline{\sigma} &\triangleq \texttt{let (x,y) = }\llbracket e\rrbracket_1~\rho~(\#1 \overline{\sigma}) \texttt{ in } (x, (y, \# 2 \overline{\sigma}))
+    \llbracket n\rrbracket~\rho~\overline{\sigma} \triangleq&~(n, \overline{\sigma})\\
+    %%%%% x
+    \llbracket x\rrbracket~\rho~\overline{\sigma} \triangleq&~(\texttt{lookup}~\rho~"x", \overline{\sigma})\\
+    %%%%% if e0 then e1 else e2
+    \llbracket \texttt{if $e_0$ then $e_1$ else $e_2$}\rrbracket~\rho~\overline{\sigma} \triangleq&~ \texttt{let $(b,\overline{\sigma'}) = \llbracket e_0 \rrbracket~\rho~\overline \sigma$ in }\\
+    &~\texttt{if $b$ then $\llbracket e_1 \rrbracket ~\rho~\overline{\sigma'}$ else $\llbracket e_2 \rrbracket ~\rho~\overline{\sigma'}$}\\
+    %%%%%%%% ref e
+    \llbracket \texttt{ref e}\rrbracket~\rho~\overline{\sigma} \triangleq&~\texttt{let ($v,\overline{\sigma'}) = \llbracket e \rrbracket~\rho~\overline \sigma$ in}\\
+    &~\texttt{let ($l, \sigma$) = malloc (\#1~$\overline{\sigma'})~v$ in ($l, (\sigma, \#2~\overline{\sigma'}$))}\\
+    %%%%%% !e
+    \llbracket !e \rrbracket~\rho~\overline{\sigma} \triangleq&~\texttt{let ($l,\overline{\sigma'}) = \llbracket e \rrbracket~\rho~\overline \sigma$ in (lookup $l$ ($\#1~\overline{\sigma'}$), $\overline{\sigma'}$)}\\
+    %%%%%% e1 := e2
+    \llbracket e_1~:=~e_2 \rrbracket~\rho~\overline{\sigma} \triangleq&~\texttt{let ($l,\overline{\sigma_1}) = \llbracket e_1 \rrbracket~\rho~\overline \sigma$ in}\\
+    &~\texttt{let } (v, \overline{\sigma_2})~=~ \llbracket e_2 \rrbracket~ \rho ~ \overline{\sigma_1} \texttt{ in } (\texttt{null, update } (\#1~\overline{\sigma_2})~l~v,~\#2~\overline{\sigma_2})\\
+    %%%%%%%%%% e1;e2
+    \llbracket e_1;~e_2 \rrbracket~\rho~\overline{\sigma} \triangleq&~\texttt{let } (\_,\overline{\sigma_1}) = \llbracket e_1 \rrbracket~\rho~\overline \sigma \texttt{ in } \llbracket e_2 \rrbracket~\rho~\overline{\sigma_1}\\
+    %%%%%% \x.e
+    \llbracket \lambda x. e \rrbracket~\rho_{lex}~\overline{\sigma_{lex}} \triangleq&~( \lambda v \overline{\sigma_{dyn}}.\llbracket e \rrbracket ~ (\texttt{update } \rho_{lex} ~ v ~ x)~\overline{\sigma_{dyn}}, \overline{\sigma_{lex}})\\
+    %%%%%% e1 e2
+    \llbracket e_1~e_2 \rrbracket~\rho_{dyn}~\overline{\sigma_{dyn}} \triangleq&~ \texttt{let } (f, \overline{\sigma_1}) = \llbracket e_1 \rrbracket ~ \rho_{dyn} ~ \overline{\sigma_{dyn}} \texttt{ in}\\
+    &~\texttt{let } (v, \overline{\sigma_2}) = \llbracket e_2 \rrbracket ~ \rho_{dyn} ~ \overline{\sigma_1} \texttt{ in } f ~ v ~ \overline{\sigma_2}\\
+    %%%%%% transation e
+    \llbracket \texttt{transaction e}\rrbracket~\rho~\overline{\sigma} \triangleq&~\llbracket e\rrbracket~\rho~(\#1~\overline{\sigma}, \overline{\sigma})\\
+    %%%%%%% abort e
+    \llbracket \texttt{abort e}\rrbracket~\rho~\overline{\sigma} \triangleq&~\llbracket e\rrbracket~\rho~(\#2 \overline{\sigma})
     \end{align*}
     The idea is that when evaluating \texttt{transaction e} we will push the current store onto the top of the list and continue evaluating $e$ in the current store. For \texttt{abort e} we will remove the first store in the list and $e$ will be evaluated in the next store since this is the store of the latest transaction.
     \item We decided to add \texttt{abort e} as one of the values so that when using the big step semantics we are able to evaluate $e$ in the original store.
