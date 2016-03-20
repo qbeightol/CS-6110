@@ -1,8 +1,5 @@
 (* read-eval-print loop *)
 
-(* Printexc.record_backtrace true *)
-let cDEBUG = false
-
 exception Quit
 
 (* current parsed program *)
@@ -15,47 +12,45 @@ let load (file : string) : unit =
     try open_in file
     with Sys_error s -> failwith ("Cannot open file: " ^ s) in
   let parse : Ast.exp =
-      let lexbuf = Lexing.from_channel ch in
+      let lexbuf = Lexing.from_channel ch in 
       try
         Parser.main Lexer.token lexbuf
-      with _ ->
-        begin
-          close_in ch;
+      with _ -> 
+        begin 
+          close_in ch;       
           failwith ("Parsing error at character " ^ string_of_int (Lexing.lexeme_end lexbuf))
-        end in
+        end in 
   program := Some parse;
   close_in ch
-
+  
 let list() : unit =
   match !program with
     | Some exp -> print_endline (Ast.to_string exp)
-    | None -> failwith "No program loaded"
+    | None -> failwith "No program loaded"     
 
 let run() : unit =
   match !program with
     | Some exp ->
         let value = Eval.eval exp (State.make()) in
         print_endline (State.to_string value)
-    | None -> failwith "No program loaded"
+    | None -> failwith "No program loaded"  
 
 let convert() : unit =
   match !program with
     | Some exp ->
         let (e, s) = Lifting.convert exp (State.make()) in
-        if cDEBUG then print_endline (Ast.to_string e);
         let value = Eval.eval e s in
         print_endline (State.to_string value)
-    | None -> failwith "No program loaded"
+    | None -> failwith "No program loaded"  
 
 let lift() : unit =
   match !program with
-    | Some exp ->
-      let p = Lifting.lift exp in
-      if cDEBUG then print_endline (Ast.to_string p);
+    | Some exp -> 
+      let p = Lifting.lift exp in 
       program := Some p;
-      if not (Lifting.is_target_prog p) then
+      if not (Lifting.is_target_prog p) then 
         failwith "Result of lift is not a valid target language program"
-    | None -> failwith "No program loaded"
+    | None -> failwith "No program loaded"  
 
 let help() : unit =
   print_endline "Available commands are:";
@@ -81,12 +76,10 @@ let rec repl() : unit =
           | ("convert", []) -> convert()
           | ("quit", []) -> quit()
           | _ -> help()
-  with Failure s ->
-    print_endline s;
-    print_endline (Printexc.get_backtrace ()));
+  with Failure s -> print_endline s);
   repl()
-
+  
 let _ =
-  print_endline "FL version 2016.0";
+  print_endline "FL version 2016.3";
   try repl()
   with Quit -> ()

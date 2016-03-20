@@ -56,7 +56,7 @@ let convert (e : exp) (s : state) : exp * state =
     | Var _ -> (e, s0)
     | Fun (args, body) ->
       convert body s0 |> fun (body', s1) ->
-      let e_fvs = HashSet.values (fv e) in
+      let e_fvs = HashSet.values (fv (Fun (args, body'))) in
       let f = Fresh.next var_gen in
       let s2 = update s1 f (Closure (Fun (e_fvs@args, body'), State.make ())) in
       (apply_to_all (Var f) e_fvs, s2)
@@ -65,11 +65,58 @@ let convert (e : exp) (s : state) : exp * state =
       convert e1 s1 |> fun (e1', s2) ->
       (App (e0', e1'), s2)
     | Let ([], _, _) -> failwith "invalid let expression"
+    (* making this a special case doesn't seem necessary, but the output code
+     * is more readable, and less likely to cause problems during evaluation *)
+    | Let ([f], e1, e2) ->
+      convert (App (Fun ([f], e2), e1)) s0
     | Let (f::args, e1, e2) ->
       convert (App (Fun ([f], e2), Fun(args, e1))) s0
     | Letrec ([], _, _) -> failwith "invalid let rec expression"
     | Letrec (f::args, e1, e2) ->
+
+      let f_fvs = fv (Fun (f::args, e1)) in
+      let new_args = HashSet.values f_fvs in
+      let new_f_name = Fresh.next var_gen in
+      let new_f_app_to_new_args = apply_to_all (Var new_f_name) (new_args) in
+      let e1_with_fixed_f_calls = subst new_f_app_to_new_args f e1 in
+      (* print_endline (State.state_to_string s0); *)
+      let final_e1, s1 = convert e1_with_fixed_f_calls s0 in
+      (* print_endline (State.state_to_string s1); *)
+      let new_f_def = Fun(new_args@args, final_e1) in
+      (* let new_f_def, s2 = convert (Fun (new_args@args, final_e1)) s1 in *)
+      (* print_endline (Ast.to_string new_f_def);
+      print_endline (State.state_to_string s2); *)
+      (* let new_f_expr = Fun (new_args@args, new_f_def) in *)
+      let (_, final_state) = rec_update (Closure (new_f_def, s1)) new_f_name in
+      (* let (_, final_state) = rec_update (Closure (Fun (args, apply_to_all new_f_def args), s1)) new_f_name in *)
+      let e2_with_updated_f_calls = subst new_f_app_to_new_args f e2 in
+      convert e2_with_updated_f_calls final_state
+(*
+
+      let final_e1, s1 = convert e1_with_fixed_f_calls in
+
+
+      let e1', s1 = convert (Fun (args, e1)) in
+      let e1_fvs = fv e1 in
+      let e1'_fvs = fv e1' in
+      let e1'_new_fvs = HashSet.
+
       let desugared_f_def = Fun (args, e1) in
+      let desugared_f_def_fvs = fv desugared_f_def in
+      HashSet.remove desugared_f_def_fvs f;
+      let new_args = HashSet.values desugared_f_def_fvs in
+      let new_f_name = Fresh.next var_gen in
+      let new_f_app_to_new_args = apply_to_all (Var new_f_name) new_args in
+      (* the desugared_f_body with f new_args subsituted in for f (so that
+       * recursive calls to f work). *)
+      let fixed_desugard_f_def = subst new_f_app_to_new_args f desugared_f_def in
+      let final_f_def, s2 = convert fixed_desugard_f_def s1 in
+      let final_f = Fun (new_args, final_f_def) in
+      let (_, final_f_state) = rec_update (Closure (final_f, s2)) new_f_name in
+      let e2_with_updated_f_calls = subst new_f_app_to_new_args f e2 in
+      convert e2_with_updated_f_calls final_f_state *)
+
+      (* let desugared_f_def = Fun (args, e1) in
       let desugared_f_def_fvs = fv desugared_f_def in
       HashSet.remove desugared_f_def_fvs f;
       let new_args = HashSet.values desugared_f_def_fvs in
@@ -80,9 +127,9 @@ let convert (e : exp) (s : state) : exp * state =
       let fixed_desugard_f_def = subst new_f_app_to_new_args f desugared_f_def in
       let final_f_def, s1 = convert fixed_desugard_f_def s0 in
       let final_f = Fun (new_args, final_f_def) in
-      let (_, final_f_state) = rec_update (Closure (final_f, State.update s1 new_f_name Error)) in
+      let (_, final_f_state) = rec_update (Closure (final_f, s1)) new_f_name in
       let e2_with_updated_f_calls = subst new_f_app_to_new_args f e2 in
-      convert e2_with_updated_f_calls final_f_state
+      convert e2_with_updated_f_calls final_f_state *)
     | Cond (b, e1, e2) ->
       let (b', s1) = convert b s0 in
       let (e1', s2) = convert e1 s1 in
@@ -140,7 +187,8 @@ let rec to_expr bs e = match bs with
     if bindings s == [] then to_expr tl (Let ([x], f, e))
     else to_expr tl (Letrec ([x], f, e))
   | (x, v)::_ ->
-    failwith ("bindings held something other than a function" ^ State.to_string v)
+    failwith ("bindings held something other than a function\n"
+              ^ State.state_to_string (State.of_bindings bs))
 
 (* let rec to_expr bindings e = match bindings with
   | [] -> e

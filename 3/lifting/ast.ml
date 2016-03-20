@@ -8,8 +8,6 @@ type id = string
 type exp =
   | Var of id
   | Fun of id list * exp
-  (* [let]s with multiple ids are sugar for functions (like in OCaml). E.g.
-     let f x y = eb in e ~> (\f.e) (\xy.eb) *)
   | Let of id list * exp * exp
   | Letrec of id list * exp * exp
   | App of exp * exp
@@ -73,7 +71,7 @@ let fv (e : exp) : id HashSet.t =
           -> fv bv e1; fv bv e2
     | Not b -> fv bv b in
   fv [] e; h
-
+  
 (* get all variables of an expression *)
 let allv (e : exp) : id HashSet.t =
   let h = HashSet.make() in
@@ -108,7 +106,7 @@ let rec subst (v : exp) (x : id) (e : exp) : exp =
         else (y, e0) in
       (match subst v x e0 with
       | Fun (t, e1') -> Fun (z :: t, e1')
-      | _ -> failwith "System error")
+      | _ -> failwith "System error")     
   | Fun ([], e1) -> Fun ([], subst v x e1)
   | App (e1, e2) -> App (subst v x e1, subst v x e2)
   | Let (f :: t, e1, e2) ->
