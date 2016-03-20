@@ -1,0 +1,4 @@
+(let rec church n f x = if n = 0 then x else f (church (n - 1) f x) in church)
+10 
+(let rec church n f x = if n = 0 then x else f (church (n - 1) f x) in church 10 (fun x -> x + 1))
+0
