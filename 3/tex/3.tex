@@ -390,7 +390,7 @@ $$Y^2_1~F~G = G~(Y^2_1~F~G)~(Y^2_2~F~G) $$
     \llbracket !e \rrbracket~\rho~\overline{\sigma} \triangleq&~\texttt{let ($l,\overline{\sigma'}) = \llbracket e \rrbracket~\rho~\overline \sigma$ in (lookup $l$ ($\#1~\overline{\sigma'}$), $\overline{\sigma'}$)}\\
     %%%%%% e1 := e2
     \llbracket e_1~:=~e_2 \rrbracket~\rho~\overline{\sigma} \triangleq&~\texttt{let ($l,\overline{\sigma_1}) = \llbracket e_1 \rrbracket~\rho~\overline \sigma$ in}\\
-    &~\texttt{let } (v, \overline{\sigma_2})~=~ \llbracket e_2 \rrbracket~ \rho ~ \overline{\sigma_1} \texttt{ in } (\texttt{null, update } (\#1~\overline{\sigma_2})~l~v,~\#2~\overline{\sigma_2})\\
+    &~\texttt{let } (v, \overline{\sigma_2})~=~ \llbracket e_2 \rrbracket~ \rho ~ \overline{\sigma_1} \texttt{ in } (\texttt{null,(update } (\#1~\overline{\sigma_2})~l~v,~\#2~\overline{\sigma_2})\\
     %%%%%%%%%% e1;e2
     \llbracket e_1;~e_2 \rrbracket~\rho~\overline{\sigma} \triangleq&~\texttt{let } (\_,\overline{\sigma_1}) = \llbracket e_1 \rrbracket~\rho~\overline \sigma \texttt{ in } \llbracket e_2 \rrbracket~\rho~\overline{\sigma_1}\\
     %%%%%% \x.e
