@@ -1,6 +1,25 @@
 \section{Hoare Logic}
+
+\newcommand{\dom}{{\sf dom}}
+
 \begin{enumerate}[(a)]
+    % TODO: consider adding dom_a(X) checks
+    \item \begin{eqnarray*}
+        \dom_a(\bar{n})        & = & {\sf true} \\
+        \dom_a(x)              & = & {\sf true} \\
+        \dom_a(a_0 \oplus a_1) & = & \dom_a(a_0) \wedge \dom_a(a_1) \\
+        \dom_a({\sf X}[a])     & = & 0 \leq a \wedge a < {\sf len(X)} \\
+        \dom_a({\sf len(X)})   & = & \dom_a({\sf X})
+    \end{eqnarray*}
+
+    \begin{eqnarray*}
+        \dom_b({\sf true})      & = & {\sf true} \\
+        \dom_b({\sf false})     & = & {\sf true} \\
+        \dom_b(a_0 \odot a_1)   & = & \dom_a(a_0) \wedge \dom_a(a_1) \\
+        \dom_b(b_0 \oslash b_1) & = & \dom_b(b_0) \wedge \dom_b(b_1) \\
+        \dom_b(\neg b)          & = & \dom_b(b) \\
+    \end{eqnarray*}
+
     \item
     \item
-    \item 
 \end{enumerate}
