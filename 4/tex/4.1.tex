@@ -1,6 +1,8 @@
 \section{Hoare Logic}
 
 \newcommand{\dom}{{\sf dom}}
+\newcommand{\ifstmt}[3]{{\sf if}~#1~{\sf then}~#2~{\sf else}~#3}
+\newcommand{\whilestmt}[2]{{\sf while}~#1~{\sf do}~#2}
 
 \begin{enumerate}[(a)]
     % TODO: consider adding dom_a(X) checks
@@ -21,5 +23,49 @@
     \end{eqnarray*}
 
     \item
+    $
+    \Rule{SimpleAssign}{}{
+        \{ \dom_a(a) \wedge P[a / x]\}
+        x := a
+        \{ P \}
+    }
+    $
+    \\
+
+    $
+    \Rule{ArrayAssign}{}{
+        \{ \dom_a(a_1) \wedge \dom_a(a_2) \wedge P[{\sf X}[a_0 \mapsto a_1] / X \}
+        {\sf X}[a_0] := a_1
+        \{ P \}
+    }
+    $
+    \\
+
+    $
+    \Rule{If}{
+        \{ b \wedge P \}
+        c_1
+        \{ Q \}
+        \\
+        \{ \neg b \wedge P \}
+        c_2
+        \{ Q \}
+    }{
+        \{ \dom_b(b) \wedge P \}
+        \ifstmt{b}{c_1}{c_2}
+        \{ Q \}
+    }
+    $
+    \\
+
+    $\Rule{While}{
+        \{ b \wedge P \}
+        c
+        \{ P \}
+    }{
+        \{ P \}
+        \whilestmt{b}{c}
+        \{ \neg b \wedge P \}
+    }$
     \item
 \end{enumerate}
