@@ -1,1 +1,75 @@
 \section{Domain Constructions}
+
+\begin{enumerate}[(a)]
+\item We claim that given CPOs $(D, \sqsubseteq_D)$ and $(E, \sqsubseteq_E)$ the domain $(D \cup E, \sqsubseteq_D \cup \sqsubseteq_E)$ is not necessarily a CPO.
+
+Let $S$ be a finite set. First we will prove that $(2^S, \subseteq)$ and $(2^S, \supseteq)$ are CPOs. In class we have seen that both of them are posets. We only need to prove that they are also chain-continuous.
+
+Consider a chain $\mathcal C = \{C_1, C_2, \ldots\}$ where $C_1 \subseteq C_2 \subseteq \ldots$ in $(2^S, \subseteq)$. It is easy to see that the supremum of the chain exists and $\sqcup \mathcal C = \bigcup \limits_i C_i$.
+
+Similarly let $\mathcal C' = \{C'_1, C'_2, \ldots\}$ be a chain in $(2^S, \supseteq)$ where $C'_1 \supseteq C'_2 \supseteq \ldots$. The supremum of the chain exists and $\sqcup \mathcal C' = \bigcap \limits_i C'_i$.
+
+%%TODO: prove these 2 are indeed the lub
+
+Taking the union of these 2 CPOs yields a binary relation, say $\sqsubseteq$ on subsets of $S$ where 2 subsets $A \sqsubseteq B$ if and only if either $A \subseteq B$ or $B \subseteq A$. This is not a poset if $S$ is non-empty since $\varnothing \sqsubseteq S$ and $S \sqsubseteq \varnothing$ but $S \neq \varnothing$.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item We claim that given 2 pointed CPOs $(D, \sqsubseteq_D)$ and $(E, \sqsubseteq_E)$, their smash sum is a CPO. Denote the sum $ D \oplus E = (\{in_1(d) | d \in D \wedge d \neq \perp_D\} \cup \{in_1(e) | e \in E \wedge e \neq \perp_E\} \cup \{\perp\}$.
+
+First we make $2$ simple observation about the smash sum. If $x \in D \oplus E$ and $in_1(d) \sqsubseteq x$ then $x = in_1(d')$ and $d \sqsubseteq_D d'$ and if $x \in D \oplus E$ and $in_2(e) \sqsubseteq x$ then $x = in_2(e')$ and $e \sqsubseteq_E e'$.
+
+Now we will prove that $(D \oplus E, \sqsubseteq)$ is a poset we will prove the 3 properties of a poset:
+\begin{enumerate}[(i)]
+\item (Reflexivity) Let $x \in D \oplus E$, we want to show that $x \sqsubseteq x$. There are 3 cases:
+  \begin{itemize}
+  \item $x = \perp$ then $\perp \sqsubseteq \perp$.
+  \item $x = in_1(d)$ then $x \sqsubseteq x$ since $d \sqsubseteq_D d$ for $(D, \sqsubseteq_D)$ is a poset.
+  \item Similarly $x = in_2(e)$ then $x \sqsubseteq x$ since $e \sqsubseteq_E e$ for $(E, \sqsubseteq_E)$ is also a poset.
+  \end{itemize}
+\item (Transitivity) Suppose $x, y, z \in D \oplus E$ and $x \sqsubseteq y$ and $y \sqsubseteq z$. We wish to show that $x \sqsubseteq z$. We will also check $3$ possible types of values of $x$.
+  \begin{itemize}
+  \item $x = \perp$ then regardless of the values of $y$ and $z$, $x \sqsubseteq z$.
+  \item $x = in_1(d)$ then it must be case that $y = in_1(d')$ and $d \sqsubseteq_D d'$ since $x \sqsubseteq y$. Similarly since $y \sqsubseteq z$, $z = in_1(d'')$ and $d' \sqsubseteq_D d''$.
+
+  $\Rightarrow d \sqsubseteq_D d''$ by transitivity in $D$ and thus $x \sqsubseteq z$.
+  \item This case is exactly the same as above with poset $E$ instead of $D$. If $x = in_2(e)$ then it must be case that $y = in_2(e')$ and $e \sqsubseteq_E e'$ since $x \sqsubseteq y$. Similarly since $y \sqsubseteq z$, $z = in_2(e'')$ and $e' \sqsubseteq_E e''$.
+
+  $\Rightarrow e \sqsubseteq_E e''$ by transitivity in $E$ and thus $x \sqsubseteq z$.
+  \end{itemize}
+\item (Antisymmetry) Suppose $x, y\in D \oplus E$ and $x \sqsubseteq y$ and $y \sqsubseteq x$. We wish to show that $x = y$. Again there are $3$ cases of $x$.
+  \begin{itemize}
+  \item $x = \perp$ then $y \sqsubseteq \perp$ which is only possible when $y = \perp = x$.
+  \item $x = in_1(d)$ then $x \sqsubseteq y$ so $y = in_1(d')$ and $d \sqsubseteq_D d'$. On the other hand $y \sqsubseteq x$ so $d' \sqsubseteq_D d \Rightarrow d = d'$ by the antisymmetry of $(D, \sqsubseteq_D) \Rightarrow x = y$.
+  \item Similarly $x = in_2(e)$ then $x \sqsubseteq y$ so $y = in_2(e')$ and $e \sqsubseteq_E e'$. On the other hand $y \sqsubseteq x$ so $e' \sqsubseteq_E e \Rightarrow e = e'$ by the antisymmetry of $(E, \sqsubseteq_E) \Rightarrow x = y$.
+  \end{itemize}
+\end{enumerate} 
+
+Next we will prove that $(D \oplus E, \sqsubseteq)$ is chain-complete.
+
+Consider a chain $\mathcal C = \{C_1, C_2, C_3, \ldots \}$ such that $C_1 \sqsubseteq C_2 \sqsubseteq C_3 \sqsubseteq \ldots$. There are 3 possible cases:
+\begin{enumerate}[(i)]
+\item $C_i = \{ \perp \}~\forall i$. It is easy to see that $\bigsqcup \mathcal C = \perp$.
+\item There exists $i$ such that $C_i = in_1(d_i)$ for some $d_i \in D$ then $\forall j \geq i, C_j = in_1(d_j)$ for some $d_j \in D$ and $d_i \sqsubseteq_D d_{i+1} \sqsubseteq_D d_{i+2} \sqsubseteq_D \ldots$. Then $d_i, d_{i+1}, d_{d+2}, \ldots$ is a chain in $D$. Since $D$ is a CPO this chain has a unique supremum. Let this be $d \in D$. We will show that $in_1(d) = \bigsqcup \mathcal C$.
+
+If $j \geq i$, $C_j = in_1(d_j) \sqsubseteq in_1(d)$.
+
+If $j < i$, $C_j \sqsubseteq C_i \sqsubseteq in_1(d)$ by transitivity. Thus $in_1(d)$ is an upper bound of $\mathcal C$.
+
+On the other hand let $x$ be an upper bound of $\mathcal C$ then $C_j \sqsubseteq x$ for all $j \geq i$. So it must be the case that $x = in_1(d')$ for some $d' \in D$ such that $d_j \sqsubseteq_D d'$ for all $j \geq i$.
+
+$\Rightarrow d = \bigsqcup\limits_{j = i}^{\infty} d_j \sqsubseteq_D d' \Rightarrow in_1(d) \sqsubseteq x$. Therefore $in_1(d)$ is the least upper bound of $\mathcal C$.
+
+\item If not all $C_i$ are $\perp$ and none of them are of the form $in_1(d)$ then there must exist $i$ such that $C_i = in_2(e_i)$ for some $e_i \in E$. This case is very similar to the one above but the supremum is taken in $E$ instead.
+
+First $\forall j \geq i, C_j = in_2(e_j)$ for some $e_j \in E$ and $e_i \sqsubseteq_E e_{i+1} \sqsubseteq_E e_{i+2} \sqsubseteq_E \ldots$. Then $e_i, e_{i+1}, e_{d+2}, \ldots$ is a chain in $E$. Since $E$ is a CPO this chain has a unique supremum. Let this be $e \in E$. We will show that $in_2(e) = \bigsqcup \mathcal C$.
+
+If $j \geq i$, $C_j = in_2(e_j) \sqsubseteq in_2(e)$.
+
+If $j < i$, $C_j \sqsubseteq C_i \sqsubseteq in_2(e)$ by transitivity. Thus $in_2(e)$ is an upper bound of $\mathcal C$.
+
+On the other hand let $x$ be an upper bound of $\mathcal C$ then $C_j \sqsubseteq x$ for all $j \geq i$. So it must be the case that $x = in_2(e')$ for some $e' \in E$ such that $e_j \sqsubseteq_E e'$ for all $j \geq i$.
+
+$\Rightarrow e = \bigsqcup\limits_{j = i}^{\infty} e_j \sqsubseteq_E e' \Rightarrow in_2(e) \sqsubseteq x$. Therefore $in_2(e)$ is the least upper bound of $\mathcal C$.
+\end{enumerate}
+
+We have shown that all chains in $D \oplus E$ has a supremum, it follows that the smash sum of 2 pointed CPOs is a CPO.
+\end{enumerate}
