@@ -2,4 +2,79 @@
 \begin{enumerate}[(a)]
 \item Suppose $x \ll y$. Consider the chain with one element $y$. The supremum of this chain is $y$ which is at least $y$ by reflexivity so this chain must contain an element that is at least $x$. Since the only element of the chain is $y$, it must be that $x \sqsubseteq y$.
 \item
+  \begin{enumerate}[i.]
+  \item Any element of $\mathbb N$ with the discrete ordering is finite. 
+
+  First note that if $\mathcal C = \{C_1, C_2, C_3, \ldots\}$ is a chain in this CPO then it must be the case that $C_1 = C_2 = C_3 = \ldots$ since the only relations are $x \sqsubseteq x$. For a chain where all elements are $x$ it is easy to see that its supremum is $x$ itself.
+
+  Let $x$ be an arbitrary natural number. Consider an arbitrary chain $z_n = y ~ \forall n$ whose supremum is at least $x$. Then $x \sqsubseteq \bigsqcup\limits_{n} z_n = y$ so all elements of the chain are at least $x$. Therefore $x \ll x$.
+  \item In $(\mathbb N \cup \{\infty\}, \leq)$ any natural number is finite. $\infty$ is the only non-finite element.
+
+  To see that $\infty$ is infinite consider the chain $z_n$ for $n = 1,2,3, \ldots$ where $z_n  = n$. $\infty$ is an upper bound of this chain since $x \leq \infty$ for any element $x$ in the CPO. For any arbitrary natural number $i$ there exists an element of the chain $z_{i+1} = i+1$ greater than $i$ so $i$ cannot be an upper bound of the chain. Thus $\infty$ is the only and least upper bound but there is no element in the chain that is at least $\infty$ so $\infty$ does not approximate itself.
+
+  Let $x$ be a natural number. We will show that $x$ approximates itself in this CPO by showing that if $z_n$ is a chain such that none of its elements is at least $x$ then its supremum cannot be at least $x$. By assumption $\forall n ~ z_n < x\Rightarrow z_n \leq x-1$. So $x-1$ is an upper bound of the chain and thus must be at least the upperbound of the chain. So $\bigsqcup z_n$ cannot be at least $x$. Therefore if a chain has supremum that is at least $x$ it must contain an element that is at least $x$. $\Box$
+  \item Given $\mathbb Z$ with the discrete ordering $\sqsubseteq_{\mathbb Z}$ we claim that any element in $\mathbb Z \rightarrow \mathbb Z$ with the pointwise ordering $\sqsubseteq$ is finite.
+
+  First let $f,g \in \mathbb Z \rightarrow \mathbb Z$ such that $f \sqsubseteq g$. By definition $f(n) \sqsubseteq_{\mathbb Z} g(n) ~ \forall n$. Since the only relations in $(\mathbb Z, \sqsubseteq_{\mathbb Z})$ are $x \sqsubseteq_{\mathbb Z} x ~ \forall x \in \mathbb Z$, $f(n) = g(n) ~ \forall n$. So the pointwise ordering $\sqsubseteq$ on $\mathbb Z \rightarrow \mathbb Z$ is also the discrete ordering. It follows that for any arbitrary chain $f_n$ in $\mathbb Z \rightarrow \mathbb Z$, $f_1 = f_2 = f_3 =\ldots$ where the equality is the pointwise equality.
+
+  Thus for an arbitrary element $f$ and an arbitrary chain $g_n$ in $\mathbb Z \rightarrow \mathbb Z$ such that $f \sqsubseteq g = \bigsqcup\limits_{n} g_n$, it must be the case that $g_n = f~\forall n$. Thus any element of this chain is at least $f$ and so $f \ll f \Box$.
+  \item In $\mathbb Z \rightarrow \mathbb Z_{\perp}$ with the pointwise ordering $\sqsubseteq$ finite elements are functions $f$ such that there are finitely many integers $n$ such that $f(n)\neq \perp$.
+
+  Consider an element $g$ in the function space such that $g$ maps infinitely many integers in $\mathbb Z$ to non-$\perp$ elements in $\mathbb Z_{\perp}$. We will show that there exists a chain whose supremum is $g$ but does not contain any element that is at least $g$. Define the elements of the chain as follows:
+
+  $g_i(n)\triangleq 
+  \begin{cases} 
+  g(n) &\mbox{if } |n| \leq i \\ 
+  \perp & \mbox{otherwise } 
+  \end{cases}.$
+
+  It is easy to see that $g_i \sqsubseteq g_{i+1}$.
+  \begin{itemize}
+  \item $g_i(n) = g_{i+1}(n)$ for $|n| \neq i+1 \Rightarrow g_i(n) \sqsubseteq_{\mathbb Z_ \perp} g_{i+1}(n)$
+  \item $g_i(n) = \perp \sqsubseteq_{\mathbb Z_ \perp} g_{i+1}(n)$ for $|n| = i+1$ since $\perp$ is the least element of the pointed CPO $\mathbb Z_{\perp}$.
+  \end{itemize}
+
+  Also $g_i \sqsubseteq g$.
+  \begin{itemize}
+  \item $g_i(n) = g(n)$ for $|n| \leq i \Rightarrow g_i(n) \sqsubseteq_{\mathbb Z_ \perp} g(n)$
+  \item $g_i(n) = \perp \sqsubseteq_{\mathbb Z_ \perp} g(n)$ for $|n| > i$.
+  \end{itemize}
+  Thus $g$ is an upper bound of the chain. 
+
+  Let $g'$ be another upper bound then $g_i(n) \sqsubseteq_{\mathbb Z_{\perp}} g'(n) ~\forall i, n $
+
+  $\Rightarrow g(n) = \bigsqcup \limits_{i} g_i(n) \sqsubseteq_{\mathbb Z_{\perp}} g'(n)~\forall n $
+
+  $\Rightarrow g \sqsubseteq g'$. Thus $g = \bigsqcup_i g_i$.
+
+  On the other hand for any arbitrary $i$, there exists $n$ such that $|n| > i$ and $g(n) \neq \perp$.
+
+  $\Rightarrow g(n) \not \sqsubseteq g_i(n) = \perp$. So there does not exist any element of the chain that is at least $g$.\\
+
+  Now we will prove that for any function $f$ which maps only finitely many elements of $\mathbb Z$ to non-$\perp$ elements of $\mathbb Z_{\perp}$, $f \ll f$.
+
+  Let $S$ be the set of integers that are mapped to non-$\perp$ elements under $f$, that is $S = f^{-1}(\mathbb Z)$.
+
+  %$S = f^{-1}(\mathbb Z) = \{s_1, s_2, \ldots s_m\}$ such that $s_1 < s_2 < \ldots < s_m$ then $f(n) = \perp ~\forall n \notin S$.
+
+  Let $f'_i$ be a chain in $\mathbb Z \rightarrow \mathbb Z_{\perp}$ whose supremum $f'$ is at least $f$.
+
+  $f \sqsubseteq f' \Rightarrow f'(s) = f(s) ~\forall s \in S$.
+
+  It is easy to see that if $f' = \bigsqcup\limits_i f'_i$ then $f'(n) = \bigsqcup\limits_{i} f'_i(n) ~ \forall n$. In $\mathbb Z_{\perp}$ any chain whose supremum is $x$ must contain $x$. Thus for $s \in S$ in the chain $f'_i(s)$ for $i = 1,2, \ldots$ there must exist an index $i_s$ such that for all $j \geq i_s$, $f'_{j}(s) = f'(s) = f(s) \neq \perp$.
+
+  Let $t = \max \limits_{s\in S} i_s$ which exists since the set $S$ is finite. Consider $f'_t$.
+
+  $f'_t(s) = f(s) \Rightarrow f(s) \sqsubseteq_{\mathbb Z_{\perp}} f'_t(s)$ for any $s \in S$.
+
+  For $s \notin S$, $f(s) = \perp \sqsubseteq_{\mathbb Z_{\perp}} f'_t(s)$.
+
+  Thus $f \sqsubseteq f'_t \Box$.
+
+  % The only finite element in $\mathbb Z \rightarrow \mathbb Z_{\perp}$ with the pointwise ordering is the constant function $f$ such that $f(n) = \perp ~\forall n \in \mathbb Z$.
+
+  % First note that $f \sqsubseteq g ~ \forall g \in \mathbb Z \rightarrow \mathbb Z$ so for any arbitrary chain $g_n$, the supremum as well as all the elements in the chain are at least $f$. By definition $f \ll f$ and thus is finite.
+
+  % Let $g$ be an arbitrary element in $\mathbb Z \rightarrow \mathbb Z$ such that $f \neq g$. Then there exists an integer $n$ such that $g(n) \neq \perp$.
+  \end{enumerate}
 \end{enumerate}
