@@ -1,1 +1,15 @@
 \section{Continuous Partial Orders}
+
+We have seen in lecture that a continuous function is also monotone. Let $f$ be an arbitrary continuous function from a pointed CPO $(D, \sqsubseteq_D)$ to a discrete CPO $(E, \sqsubseteq_E)$. Let $\perp_D$ be the least element in $D$.
+
+Let $x = f(\perp_D)$. For all $d \in D$, $\perp_D \sqsubseteq_D d \Rightarrow x = f(\perp_D) \sqsubseteq_E f(d)$. 
+
+But for all $e \in E$, $e$ is only comparable to itself so $f(d) = x$. In other words, all elements in $D$ are mapped to the same element $x$ in $E$. This is the necessary condition for $f$ to be continuous.
+
+We will show that this is also sufficient. Let $g$ be a constant function from $D$ to $E$ which maps all elements in D to an element $e \in E$. 
+
+Let $\mathcal C = \{C_1, C_2, C_3, \ldots\}$ be a chain in $D$ and let $d = \bigsqcup \mathcal C$.
+
+$f(\bigsqcup \mathcal C) = f(d) = e = \bigsqcup\limits_{i = 1}^{\infty} e = \bigsqcup\limits_{i = 1}^{\infty} f(C_i)$.
+
+Thus $g$ is also chain continuous $\Box$.
