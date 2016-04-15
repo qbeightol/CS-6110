@@ -5,67 +5,113 @@
 \newcommand{\whilestmt}[2]{{\sf while}~#1~{\sf do}~#2}
 
 \begin{enumerate}[(a)]
-    % TODO: consider adding dom_a(X) checks
-    \item \begin{eqnarray*}
-        \dom_a(\bar{n})        & = & {\sf true} \\
-        \dom_a(x)              & = & {\sf true} \\
-        \dom_a(a_0 \oplus a_1) & = & \dom_a(a_0) \wedge \dom_a(a_1) \\
-        \dom_a({\sf X}[a])     & = & 0 \leq a \wedge a < {\sf len(X)} \\
-        \dom_a({\sf len(X)})   & = & \dom_a({\sf X})
-    \end{eqnarray*}
+% TODO: consider adding dom_a(X) checks
+\item \begin{eqnarray*}
+    \dom_a(\bar{n})        & = & {\sf true} \\
+    \dom_a(x)              & = & {\sf true} \\
+    \dom_a(a_0 \oplus a_1) & = & \dom_a(a_0) \wedge \dom_a(a_1) \\
+    \dom_a({\sf X}[a])     & = & 0 \leq a \wedge a < {\sf len(X)} \\
+    \dom_a({\sf len(X)})   & = & \dom_a({\sf X})
+\end{eqnarray*}
 
+\begin{eqnarray*}
+    \dom_b({\sf true})      & = & {\sf true} \\
+    \dom_b({\sf false})     & = & {\sf true} \\
+    \dom_b(a_0 \odot a_1)   & = & \dom_a(a_0) \wedge \dom_a(a_1) \\
+    \dom_b(b_0 \oslash b_1) & = & \dom_b(b_0) \wedge \dom_b(b_1) \\
+    \dom_b(\neg b)          & = & \dom_b(b) \\
+\end{eqnarray*}
+
+\item
+$
+\Rule{SimpleAssign}{}{
+    \{ \dom_a(a) \wedge P[a / x]\}
+    x := a
+    \{ P \}
+}
+$
+\\
+
+$
+\Rule{ArrayAssign}{}{
+    \{ \dom_a({\sf X}[a_0]) \wedge \dom_a(a_1) \wedge P[{\sf X}[a_0 \mapsto a_1] / X \}
+    {\sf X}[a_0] := a_1
+    \{ P \}
+}
+$
+\\
+
+$
+\Rule{If}{
+    \{ b \wedge P \}
+    c_1
+    \{ Q \}
+    \\
+    \{ \neg b \wedge P \}
+    c_2
+    \{ Q \}
+}{
+    \{ \dom_b(b) \wedge P \}
+    \ifstmt{b}{c_1}{c_2}
+    \{ Q \}
+}
+$
+\\
+
+$\Rule{While}{
+    \{ b \wedge P \}
+    c
+    \{ P \}
+}{
+    \{ P \}
+    \whilestmt{b}{c}
+    \{ \neg b \wedge P \}
+}$
+
+\item
+\begin{enumerate}[i.]
+    \item
     \begin{eqnarray*}
-        \dom_b({\sf true})      & = & {\sf true} \\
-        \dom_b({\sf false})     & = & {\sf true} \\
-        \dom_b(a_0 \odot a_1)   & = & \dom_a(a_0) \wedge \dom_a(a_1) \\
-        \dom_b(b_0 \oslash b_1) & = & \dom_b(b_0) \wedge \dom_b(b_1) \\
-        \dom_b(\neg b)          & = & \dom_b(b) \\
+        A_0 = & \forall k . & 0 \leq k < j - 1 \\
+              &             & \Rightarrow  {\sf X}[k] > {\sf X}[k + 1] \\
+              & & \\
+        A_1 = & \forall k.  & (0 \leq k < i) \vee (1 + 1 \leq k < j - 1) \\
+              &             & \Rightarrow {\sf X}[k] > {\sf X}[k + 1] \\
+              &    \wedge   & i + 1 < {\sf len(x)} \\
     \end{eqnarray*}
 
     \item
-    $
-    \Rule{SimpleAssign}{}{
-        \{ \dom_a(a) \wedge P[a / x]\}
-        x := a
-        \{ P \}
-    }
-    $
-    \\
+    \begin{proof} \hspace{1cm} \\
+        \begin{itemize}
+        \item $\neg (j < {\sf len(X)})$ implies $j \geq {\sf len}(x)$
+        \item we can apply$A_0$ to each $k$ in the range
+        $[0, {\sf len}(x) - 1]$ to show that $P$ holds.
+        \end{itemize}
+    \end{proof}
 
-    $
-    \Rule{ArrayAssign}{}{
-        \{ \dom_a(a_1) \wedge \dom_a(a_2) \wedge P[{\sf X}[a_0 \mapsto a_1] / X \}
-        {\sf X}[a_0] := a_1
-        \{ P \}
-    }
-    $
-    \\
-
-    $
-    \Rule{If}{
-        \{ b \wedge P \}
-        c_1
-        \{ Q \}
-        \\
-        \{ \neg b \wedge P \}
-        c_2
-        \{ Q \}
-    }{
-        \{ \dom_b(b) \wedge P \}
-        \ifstmt{b}{c_1}{c_2}
-        \{ Q \}
-    }
-    $
-    \\
-
-    $\Rule{While}{
-        \{ b \wedge P \}
-        c
-        \{ P \}
-    }{
-        \{ P \}
-        \whilestmt{b}{c}
-        \{ \neg b \wedge P \}
-    }$
     \item
+    \begin{proof}
+        \newcommand{\leftPremise}{LP}
+        \newcommand{\leftBase}{LB}
+        \newcommand{\rightPremise}{RP}
+        \newcommand{\rightBase}{
+            \{ \dom_a(i - 1) \wedge A_1[i - 1/ i] \}
+            i = i - 1
+            \{ A_1 \}
+        }
+        \newcommand{\treeBase}{
+            \{ A_1 \wedge ((i \geq 0) \wedge {\sf X}[i] < x) \}
+            {\sf X}[i + 1]
+            \{ A_1 \}
+        }
+        $$ \inferrule{
+                \inferrule{\leftPremise}{\leftBase}
+                \\
+                \inferrule{\rightPremise}{\rightBase}
+            }{\treeBase}
+        $$
+    \end{proof}
+    \end{enumerate}
+
+
 \end{enumerate}
