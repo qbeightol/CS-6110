@@ -1,8 +1,11 @@
 \section{Hoare Logic}
 
+\newcommand{\true}{\textsf{true}}
+\newcommand{\len}[1]{\textsf{len}(#1)}
 \newcommand{\dom}{{\sf dom}}
 \newcommand{\ifstmt}[3]{{\sf if}~#1~{\sf then}~#2~{\sf else}~#3}
 \newcommand{\whilestmt}[2]{{\sf while}~#1~{\sf do}~#2}
+\newcommand{\X}{\textsf{X}}
 
 \begin{enumerate}[(a)]
 % TODO: consider adding dom_a(X) checks
@@ -11,7 +14,7 @@
     \dom_a(x)              & = & {\sf true} \\
     \dom_a(a_0 \oplus a_1) & = & \dom_a(a_0) \wedge \dom_a(a_1) \\
     \dom_a({\sf X}[a])     & = & 0 \leq a \wedge a < {\sf len(X)} \\
-    \dom_a({\sf len(X)})   & = & \dom_a({\sf X})
+    \dom_a({\sf len(X)})   & = & {\sf true} \\
 \end{eqnarray*}
 
 \begin{eqnarray*}
@@ -72,44 +75,108 @@ $\Rule{While}{
 \begin{enumerate}[i.]
     \item
     \begin{eqnarray*}
-        A_0 = & \forall k . & 0 \leq k < j - 1 \\
-              &             & \Rightarrow  {\sf X}[k] > {\sf X}[k + 1] \\
+        A_0 = & \forall k . & 0 \leq k < j - 1 \Rightarrow  {\sf X}[k] > {\sf X}[k + 1] \\
               & & \\
-        A_1 = & \forall k.  & (0 \leq k < i) \vee (1 + 1 \leq k < j - 1) \\
-              &             & \Rightarrow {\sf X}[k] > {\sf X}[k + 1] \\
-              &    \wedge   & i + 1 < {\sf len(x)} \\
+        A_1 = & \forall k. & (0 \leq k < j - 1) \Rightarrow \X[k] \geq \X[k + 1] \\
+              & \wedge     & i < \len{\X} \\
     \end{eqnarray*}
 
     \item
     \begin{proof} \hspace{1cm} \\
         \begin{itemize}
         \item $\neg (j < {\sf len(X)})$ implies $j \geq {\sf len}(x)$
-        \item we can apply$A_0$ to each $k$ in the range
-        $[0, {\sf len}(x) - 1]$ to show that $P$ holds.
+        \item we can apply $A_0$ to each $k$ in the range
+        $[0, {\sf len}(x) - 2]$ to show that $P$ holds.
         \end{itemize}
     \end{proof}
 
     \item
-    \begin{proof}
-        \newcommand{\leftPremise}{LP}
-        \newcommand{\leftBase}{LB}
-        \newcommand{\rightPremise}{RP}
-        \newcommand{\rightBase}{
+    \begin{proof} We'll present the proof tree in three parts: Left-Tree will
+        give a derivation for the first command, Right-Tree will give a
+        derivation for the second, and an overall derivation will
+        show how the proof trees can be combined. We'll present these trees
+        in reverse order to reflect the way they were derived.
+
+        \newcommand{\leftPremise}{
+            \{ \dom_a(i + 1) \wedge \dom_a({\sf X}[i])
+               \wedge A_1[i - 1 / i][i + 1 \mapsto \X[\X[i]
+             \}
+             ~\X[i = 1] = \X[i]~
+             \{ A_1[i - 1/ i] \}
+        }
+
+        \newcommand{\leftBase}{
+            \{ A_1 \wedge ((i \geq 0) \wedge {\sf X}[i] < x) \}
+            ~\X[i = 1] = \X[i]~
+            \{ A_1[i - 1/ i] \}
+        }
+
+        \newcommand{\rightPremise}{
             \{ \dom_a(i - 1) \wedge A_1[i - 1/ i] \}
-            i = i - 1
+            ~i = i - 1~
+            \{ A_1 \}
+        }
+
+        \newcommand{\rightBase}{
+            \{ A_1[i - 1/ i] \}
+            ~i = i - 1~
             \{ A_1 \}
         }
         \newcommand{\treeBase}{
             \{ A_1 \wedge ((i \geq 0) \wedge {\sf X}[i] < x) \}
-            {\sf X}[i + 1]
+            ~\X[i + 1] = \X[i];~i = i - 1~
             \{ A_1 \}
         }
+
+        \underline{Overall derivation}:
+
         $$ \inferrule{
-                \inferrule{\leftPremise}{\leftBase}
+                \text{Left-Tree}
                 \\
-                \inferrule{\rightPremise}{\rightBase}
+                \text{Right-Tree}
             }{\treeBase}
         $$
+
+        \underline{Right-Tree}: \\
+        $$ \inferrule{\rightPremise}{\rightBase} $$
+
+        Note that $\dom_a(i - 1)$ is always true by definition.
+
+        \underline{Left-Tree}:  \\
+        $$ \inferrule{\leftPremise}{\leftBase} $$
+
+        This tree is difficult to read, so let's break it into simpler parts.
+        The left-most proposition in the premise is the result of applying
+        our rule for array assignments. It consists of 3 parts:
+
+        \begin{itemize}
+        \item $\dom_a(i + 1)$
+        \item $\dom_a({\sf X}[i])$
+        \item $A_1[i - 1 / i][\X[i + 1 \mapsto \X[i]]$
+        \end{itemize}
+
+        The last clause is equivalent to
+
+        $$ i - 1 < {\sf len(X)} \wedge \forall k. (0 \leq k < j - 1) \Rightarrow \X[k] \geq \X[k + 1]$$
+
+        These three clauses follow from $ A_1 \wedge ((i \geq 0) \wedge {\sf X}[i] < x) $
+
+        \begin{itemize}
+        \item $\dom_a(i + 1) = \dom_a(i) \wedge \dom_a(1) = \true $
+        \item $\dom_a({\sf X}[i]) = 0 \leq i \wedge i < \len{\X} $ follows from
+        $i \geq 0$ and $i < \len{\X}$ (the latter comes from $A_1$).
+        \item This clause is just a weakened version of $A_1$. Note that the right
+        clause of the conjunction is the same and that
+        $i < \len{\X} \Rightarrow i - 1 < \len{\X}$, the left clause of the
+        conjunction.
+
+        % $A_1$ satisfies leads directly to most parts of the third clause. What's unclear is whether the $forall k$ proposition holds in the $k = i$ case.
+
+        \end{itemize}
+
+
+
+
     \end{proof}
     \end{enumerate}
 
