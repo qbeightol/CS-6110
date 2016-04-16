@@ -77,7 +77,7 @@ $\Rule{While}{
     \begin{eqnarray*}
         A_0 & = & \forall k .~0 \leq k < j - 1 \Rightarrow  {\sf X}[k] \geq {\sf X}[k + 1] \\
               & & \\
-        A_1 & = & \forall k.~(0 \leq k < j - 1) \Rightarrow \X[k] \geq \X[k + 1] \\
+        A_1 & = & \forall k.~0 \leq k < j - 1 \Rightarrow \X[k] \geq \X[k + 1] \\
               & \wedge     & i < \len{\X} \\
               & \wedge     & \forall k .~i < k \leq j \Rightarrow  x \geq X[k]
     \end{eqnarray*}
@@ -159,27 +159,37 @@ $\Rule{While}{
 
         The last clause is equivalent to
 
-        $$
-        i - 1 < {\sf len(X)}
-        \wedge \forall k. (0 \leq k < j - 1) \Rightarrow \X[k] \geq \X[k + 1]
-        \wedge \forall k . i - 1 < k \leq j \Rightarrow  x \geq X[k]
-        $$
+        \begin{eqnarray*}
+        & & i - 1 < {\sf len(X)} \\
+        & \wedge & \forall k. 0 \leq k < j - 1 \Rightarrow \X'[k] \geq \X'[k + 1] \\
+        & \wedge & \forall k . i - 1 < k \leq j \Rightarrow  x \geq \X'[k] \\
+        \end{eqnarray*}
 
-        These three clauses follow from $ A_1 \wedge ((i \geq 0) \wedge {\sf X}[i] < x) $
+        where $\X' = \X[i + 1 \mapsto \X[i]]$. These three clauses follow from
+        $ A_1 \wedge ((i \geq 0) \wedge {\sf X}[i] < x) $
 
         \begin{itemize}
         \item $\dom_a(i + 1) = \dom_a(i) \wedge \dom_a(1) = \true $
         \item $\dom_a({\sf X}[i]) = 0 \leq i \wedge i < \len{\X} $ follows from
         $i \geq 0$ and $i < \len{\X}$ (the latter comes from $A_1$).
         \item Note that
+
         $$i < \len{\X} \Rightarrow i - 1 < \len{\X}$$ \\
         $$ \forall k. (0 \leq k < j - 1) \Rightarrow \X[k] \geq \X[k + 1] $$
         $$ \Rightarrow $$
-        $$ \forall k. (0 \leq k < j - 1) \Rightarrow \X[k] \geq \X[k + 1] $$ \\
+        $$ \forall k. (0 \leq k < j - 1) \Rightarrow  \X'[k] \geq \X[k + 1] $$ \\
+        This is slightly subtle---all but two cases of the conclusion come from the assumption. The
+        cases that don't come from the assumption are $k = i$ and $k = i + 1$.
+        The former is true because $\X'$ maps $i + 1$ to $\X[i]$ while keeping
+        $i's$ binding the same. The latter is true because
+        $\X'[i + 1] = \X[i] \leq \X[i + 1] \leq \X[i + 2] = \X'[i + 2]$.
+
         $$ {\sf X}[i] < x \wedge \forall k .~i - 1 < k \leq j \Rightarrow  x \geq X[k] $$
         $$ \Rightarrow $$
-        $$ \forall k .~i < k \leq j \Rightarrow  x \geq X[k] $$
+        $$ \forall k .~i < k \leq j \Rightarrow  x \geq  \X'[k] $$
 
+        This implication holds for similar reasons. The key insight is that
+        $\X'$ maps $i$ and $i + 1$ to $\X[i]$ which implies $x < \X'[i] = \X'[i + 1]$.
         So this clause holds as well.
 
         % This clause is just a weakened version of $A_1$. Note that the right
