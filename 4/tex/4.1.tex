@@ -66,7 +66,7 @@ $\Rule{While}{
     c
     \{ P \}
 }{
-    \{ P \}
+    \{ \dom_b(b) \wedge P \}
     \whilestmt{b}{c}
     \{ \neg b \wedge P \}
 }$
@@ -75,10 +75,11 @@ $\Rule{While}{
 \begin{enumerate}[i.]
     \item
     \begin{eqnarray*}
-        A_0 = & \forall k . & 0 \leq k < j - 1 \Rightarrow  {\sf X}[k] > {\sf X}[k + 1] \\
+        A_0 & = & \forall k .~0 \leq k < j - 1 \Rightarrow  {\sf X}[k] > {\sf X}[k + 1] \\
               & & \\
-        A_1 = & \forall k. & (0 \leq k < j - 1) \Rightarrow \X[k] \geq \X[k + 1] \\
+        A_1 & = & \forall k.~(0 \leq k < j - 1) \Rightarrow \X[k] \geq \X[k + 1] \\
               & \wedge     & i < \len{\X} \\
+              & \wedge     & \forall k .~i < k \leq j \Rightarrow  x \geq X[k]
     \end{eqnarray*}
 
     \item
@@ -157,7 +158,11 @@ $\Rule{While}{
 
         The last clause is equivalent to
 
-        $$ i - 1 < {\sf len(X)} \wedge \forall k. (0 \leq k < j - 1) \Rightarrow \X[k] \geq \X[k + 1]$$
+        $$
+        i - 1 < {\sf len(X)}
+        \wedge \forall k. (0 \leq k < j - 1) \Rightarrow \X[k] \geq \X[k + 1]
+        \wedge \forall k . i - 1 < k \leq j \Rightarrow  x \geq X[k]
+        $$
 
         These three clauses follow from $ A_1 \wedge ((i \geq 0) \wedge {\sf X}[i] < x) $
 
@@ -165,10 +170,21 @@ $\Rule{While}{
         \item $\dom_a(i + 1) = \dom_a(i) \wedge \dom_a(1) = \true $
         \item $\dom_a({\sf X}[i]) = 0 \leq i \wedge i < \len{\X} $ follows from
         $i \geq 0$ and $i < \len{\X}$ (the latter comes from $A_1$).
-        \item This clause is just a weakened version of $A_1$. Note that the right
-        clause of the conjunction is the same and that
-        $i < \len{\X} \Rightarrow i - 1 < \len{\X}$, the left clause of the
-        conjunction.
+        \item Note that
+        $$i < \len{\X} \Rightarrow i - 1 < \len{\X}$$ \\
+        $$ \forall k. (0 \leq k < j - 1) \Rightarrow \X[k] \geq \X[k + 1] $$
+        $$ \Rightarrow $$
+        $$ \forall k. (0 \leq k < j - 1) \Rightarrow \X[k] \geq \X[k + 1] $$ \\
+        $$ {\sf X}[i] < x \wedge \forall k .~i - 1 < k \leq j \Rightarrow  x \geq X[k] $$
+        $$ \Rightarrow $$
+        $$ \forall k .~i < k \leq j \Rightarrow  x \geq X[k] $$
+
+        So this clause holds as well.
+
+        % This clause is just a weakened version of $A_1$. Note that the right
+        % clause of the conjunction is the same and that
+        % $i < \len{\X} \Rightarrow i - 1 < \len{\X}$, the left clause of the
+        % conjunction.
 
         % $A_1$ satisfies leads directly to most parts of the third clause. What's unclear is whether the $forall k$ proposition holds in the $k = i$ case.
 
