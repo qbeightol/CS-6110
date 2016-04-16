@@ -100,15 +100,15 @@ $\Rule{While}{
 
         \newcommand{\leftPremise}{
             \{ \dom_a(i + 1) \wedge \dom_a({\sf X}[i])
-               \wedge A_1[i - 1 / i][i + 1 \mapsto \X[\X[i]
+               \wedge A_1[i - 1 / i][\X[i + 1 \mapsto \X[i]]
              \}
-             ~\X[i = 1] = \X[i]~
+             ~\X[i + 1] = \X[i]~
              \{ A_1[i - 1/ i] \}
         }
 
         \newcommand{\leftBase}{
             \{ A_1 \wedge ((i \geq 0) \wedge {\sf X}[i] < x) \}
-            ~\X[i = 1] = \X[i]~
+            ~\X[i + 1] = \X[i]~
             \{ A_1[i - 1/ i] \}
         }
 
