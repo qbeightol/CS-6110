@@ -1,1 +1,7 @@
 \section{Type Soundness}
+No, ``subject expansion'' does not hold for $\lambda^{\rightarrow}$. Consider
+
+$$ (\fun x \tau {\fun y \sigma y})~\Omega \rightarrow \fun y \sigma y $$
+
+The left-hand side isn't type-able because $\Omega$ appears as a subterm, but
+the righthand side has the type $\sigma \rightarrow \sigma$.
