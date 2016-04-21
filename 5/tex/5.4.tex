@@ -1,7 +1,73 @@
 \section{Polymorphism}
 
+
+\newcommand{\bool}{\textsf{bool}}
+\newcommand{\true}{\textsf{true}}
+\newcommand{\false}{\textsf{false}}
+\newcommand{\If}{\textsf{if}}
+\newcommand{\definedAs}{\triangleq}
+\newcommand{\FN}[1]{\Lambda {#1} .}
+\newcommand{\Fun}[2]{\FN{#1}\,#2}
+
+\newcommand{\tlToGamma}{\tau_\ell \rightarrow \gamma}
+\newcommand{\trToGamma}{\tau_r \rightarrow \gamma}
+\newcommand{\In}{\textsf{in}}
+\newcommand{\case}{\textsf{case}}
+
+\newcommand{\Lt}[3]{{\sf let}~{#1}:{#2} = {#3}~{\sf in}}
+\newcommand{\Let}[4]{\Lt {#1} {#2} {#3}~{#4}}
+\newcommand{\pair}{\textsf{pair}}
+\newcommand{\nat}{\textsf{nat}}
+\newcommand{\fst}{\textsf{fst}}
+\newcommand{\snd}{\textsf{snd}}
+\renewcommand{\pi}{\textsf{pi}}
+\newcommand{\step}{\textsf{step}}
+\newcommand{\R}{\textsf{R}}
+\renewcommand{\succ}{\textsf{succ}}
+\newcommand{\zero}{\textsf{zero}}
+
+
 \begin{enumerate}[(a)]
-\item
-\item
-\item
+\item \begin{eqnarray*}
+    \bool  & \definedAs & \forall \alpha . \alpha \rightarrow \alpha \rightarrow \alpha \\
+    \true  & \definedAs & \Fun \alpha {\fun x \alpha {\fun y \alpha x}} \\
+    \false & \definedAs & \Fun \alpha {\fun x \alpha {\fun y \alpha y}} \\
+    \If    & \definedAs & \Fun \alpha {\fun b \bool {\fun x \alpha {\fun y \alpha {b~\alpha~x~y}}}}
+\end{eqnarray*}
+
+\item \begin{eqnarray*}
+    \tau_\ell + \tau_r & \definedAs & \Fun \gamma {(\tlToGamma) \rightarrow (\trToGamma) \rightarrow \gamma} \\
+    \In_\ell           & \definedAs & \Fun {\alpha, \beta, \gamma} {\fun \ell \alpha {\fun {f_\ell} {\alpha \rightarrow \gamma} {\fun {f_r} {\beta \rightarrow \gamma} {f_\ell~\ell}}}} \\
+    \In_r              & \definedAs & \Fun {\alpha, \beta, \gamma} {\fun r \beta {\fun {f_\ell} {\alpha \rightarrow \gamma} {\fun {f_r} {\beta \rightarrow \gamma} {f_r~r}}}} \\
+    \case              & \definedAs & \FN {\alpha, \beta, \gamma} \\
+                       &            & \hspace{5mm}  \Fn s     {\alpha + \beta} \\
+                       &            & \hspace{10mm} \Fn {f_\ell} {\alpha \rightarrow \gamma} \\
+                       &            & \hspace{15mm} \Fn {f_r} {\beta \rightarrow \gamma} \\
+                       &            & \hspace{20mm} s~f_\ell~f_r
+\end{eqnarray*}
+
+$\Fun {\alpha, \beta, \gamma} e$ is syntactic sugar for $\Fun \alpha {\Fun \beta {\Fun \gamma e}}$.
+
+\item To keep our notation simple, we'll introduce a few definitions:
+\begin{eqnarray*}
+    \Let x \tau {e_x} e & \definedAs & (\fun x \tau e)~e_x \\
+    (a, b)              & \definedAs & \pair~\nat~\nat~a~b \\
+    \fst~p              & \definedAs & \pi_1~\nat~\nat~p \\
+    \snd~p              & \definedAs & \pi_2~\nat~\nat~p \\
+\end{eqnarray*}
+
+Then we can define $\step$ and \R:
+
+\begin{eqnarray*}
+    \step & \definedAs & \Fn f {\nat \rightarrow \nat \rightarrow \nat} \\
+          &            & \hspace{5mm} \Fn p {\nat \times \nat} \\
+          &            & \hspace{1cm} \Lt a \nat {\fst~p} \\
+          &            & \hspace{1cm} \Lt b \nat {\snd~p} \\
+          &            & \hspace{1cm} (f~a~(\succ~b), \succ~b) \\
+    \R    & \definedAs &  \Fn n \nat \\
+          &            & \hspace{5mm} \Fn f {\nat \rightarrow \nat \rightarrow \nat} \\
+          &            & \hspace{10mm} \Fn m \nat \\
+          &            & \hspace{15mm} \fst~(m~(\step~f), (n, \zero))
+\end{eqnarray*}
+
 \end{enumerate}
