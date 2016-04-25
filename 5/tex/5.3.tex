@@ -2,6 +2,15 @@
 
 \begin{enumerate}[(a)]
 \item
+\begin{align*}
+\texttt{ack} \triangleq ( \lambda ~ &\texttt{refack}:(\ii \rightarrow \ii \rightarrow \ii) ~ \ff .\\
+&\texttt{refack} := \lambda m : \ii. ~ \lambda n : \ii . ~ \\
+&\texttt{if } m = 0 \texttt{ then } n+1 \texttt{ else}\\
+&\texttt{if } m>0 \texttt{ and } n = 0 \texttt{ then } (!\texttt{refack}) ~ (m-1) ~1 \texttt{ else } \\
+&(!\texttt{refack}) ~ (m-1) ~ ((!\texttt{refack}) ~ m ~ (n-1)) ) \\
+&\left ( \ff \left ( ~ \lambda x : \ii~.~\lambda y : \ii~.~ x+ y \right ) \right )
+\end{align*}
+The idea is that we first define a variable of type $(\ii \rightarrow \ii \rightarrow \ii) ~ \ff$ and update this location with the recursive function of the Ackermann function.
 \item
 \item
 \item
