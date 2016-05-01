@@ -10,8 +10,78 @@
 &(!\texttt{refack}) ~ (m-1) ~ ((!\texttt{refack}) ~ m ~ (n-1)) ) \\
 &\left ( \ff \left ( ~ \lambda x : \ii~.~\lambda y : \ii~.~ x+ y \right ) \right )
 \end{align*}
-The idea is that we first define a variable of type $(\ii \rightarrow \ii \rightarrow \ii) ~ \ff$ and update this location with the recursive function of the Ackermann function.
-\item
-\item
+The idea is that we first define a variable \texttt{refack} of type $(\ii \rightarrow \ii \rightarrow \ii) ~ \ff$ and update this location with the recursive function of the Ackermann function.
+\item The same idea can be used to implement the \texttt{rec} $f : \sigma \rightarrow \tau.\lambda x : \sigma.e$ where we first create a variable $rf$ of type $(\sigma \rightarrow \tau)~\ff$ and replace any occurrence of $f$ in $e$ by $!rf$ and assign $e$ to $rf$.
+\item To formalize the type preservation property we will first define a function $f$ to encapsulate how the location context is changed as evaluation rules are applied. 
+
+The idea is for any well-types expression $e$ if $\Sigma; \Gamma \vdash \sigma$ and $f(
+  \langle e, \sigma \rangle \rightarrow \langle e', \sigma' \rangle,
+  \Gamma, 
+  \Sigma) = \Sigma'$ where then $\Sigma'; \Gamma \vdash \sigma'$. 
+
+The function $f$ can be defined inductively based on the proof tree of $\langle e, \sigma \rangle \rightarrow \langle e', \sigma' \rangle$. We define $f$ for each evaluation rule as follows
+\begin{enumerate}[i.]
+\item If \Rule{}{
+    \langle e, \sigma \rangle \rightarrow \langle e', \sigma' \rangle
+  }{
+    \langle E[e], \sigma \rangle \rightarrow \langle E[e'], \sigma' \rangle
+  }
+
+  then $f(
+  \langle E[e], \sigma \rangle \rightarrow \langle E[e'], \sigma' \rangle,
+  \Gamma, 
+  \Sigma) \triangleq f(
+  \langle e, \sigma \rangle \rightarrow \langle e', \sigma' \rangle,
+  \Gamma, 
+  \Sigma)$
+
+\item If \Rule{}{
+    l \notin \texttt{dom} ~ \sigma
+  }{
+    \langle \ff~v, \sigma \rangle \rightarrow \langle l, \sigma[v/l] \rangle
+  } and $\Sigma; \Gamma \vdash v : \tau$
+
+  then $f(
+  \langle \ff~v, \sigma \rangle \rightarrow \langle l, \sigma[v/l],
+  \Gamma, 
+  \Sigma) \triangleq 
+  \Sigma; l, \tau$
+
+\item If \Rule{}{
+  }{
+    \langle !l, \sigma \rangle \rightarrow \langle \sigma(l), \sigma \rangle
+  }
+
+  then $f(
+  \langle !l, \sigma \rangle \rightarrow \langle \sigma(l), \sigma \rangle,
+  \Gamma, 
+  \Sigma) \triangleq \Sigma$
+
+\item If \Rule{}{
+  }{
+    \langle l := v, \sigma \rangle \rightarrow \langle v, \sigma[v/l] \rangle
+  }
+
+  then $f(
+  \langle l := v, \sigma \rangle \rightarrow \langle v, \sigma[v/l],
+  \Gamma, 
+  \Sigma) \triangleq \Sigma$
+
+\item Other evaluation rules are extended from $\lambda^{\rightarrow}$ so the store $\sigma$ is unchanged.
+
+  $f(
+  \langle e, \sigma \rangle \rightarrow \langle e', \sigma,
+  \Gamma, 
+  \Sigma) \triangleq \Sigma$
+
+The type preservation property for the extended $\lambda^{\rightarrow}$:
+\begin{align*}
+&\Sigma;\Gamma \vdash e : \tau \\
+\wedge~&\Sigma;\Gamma \vdash \sigma\\
+\wedge~&\langle e, \sigma \rangle \rightarrow \langle e', \sigma' \rangle\\
+\wedge~&\Sigma' = f(\langle e, \sigma \rangle \rightarrow \langle e', \sigma' \rangle, \Gamma, \Sigma)\\
+\Longrightarrow~&\Sigma';\Gamma \vdash e' : \tau \wedge \Sigma';\Gamma \vdash \sigma'
+\end{align*}
+\end{enumerate}
 \item
 \end{enumerate}

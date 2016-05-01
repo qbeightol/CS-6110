@@ -26,6 +26,17 @@
 \newcommand{\fun}[3]{\Fn {#1} {#2}\,{#3}}
 \newcommand{\ff}{\texttt{ref}}
 \newcommand{\ii}{\texttt{int}}
+\newcommand{\Rule}[3]{
+    \label{rule:#1}
+  \ensuremath{\inferrule{#2}{#3}}
+}
+\newcommand{\RuleWithCondition}[4]{
+  \label{rule:#1}
+  \hfill
+  \ensuremath{\inferrule{#2}{#3}}
+  (#4)
+  \hfill
+}
 
 % Document %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
