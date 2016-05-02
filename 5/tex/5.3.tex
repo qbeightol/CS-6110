@@ -87,7 +87,7 @@ The type preservation property for the extended $\lambda^{\rightarrow}$:
 
 \textbf{Lemma 1}: If $\Sigma;\Gamma \vdash e : \tau$ and $\Sigma \subseteq \Sigma'$ then $\Sigma';\Gamma \vdash e : \tau$ where $\Sigma \subseteq \Sigma'$ if $\dd \Sigma \subseteq \dd \Sigma'$ and $\forall l \in \dd \Sigma. ~ \Sigma(l) = \Sigma'(l)$.
 
-%%\textbf{Proof} (of lemma 1): %%TODO
+%%  \textbf{Proof} (of lemma 1): %%TODO
 
 \textbf{Lemma 2}: If $\Sigma;\Gamma \vdash e : \tau \wedge\Sigma;\Gamma \vdash \sigma \wedge \langle e, \sigma \rangle \rightarrow \langle e', \sigma' \rangle$ then $\Sigma \subseteq \Sigma' =  f(\langle e, \sigma \rangle \rightarrow \langle e', \sigma' \rangle, \Gamma, \Sigma)$
 
@@ -323,9 +323,9 @@ In order to prove that claim we will induct on the context $E$.
   \end{align*}
   Let $\sigma' = \sigma[v/l]$. We will prove that $\Sigma';\Gamma \vdash \sigma' \wedge \Sigma';\Gamma \vdash v : \tau$ which is equivalent to $\Sigma;\Gamma \vdash \sigma' \wedge \Sigma;\Gamma \vdash v : \tau$ since by definition of $f$, $\Sigma' = \Sigma$.
 
-  \begin{enumerate}
+  \begin{itemize}
   \item Claim: $\Sigma;\Gamma \vdash \sigma'$
-    \begin{enumerate}
+    \begin{itemize}
     \item $l \in \dd \sigma\Rightarrow \dd \sigma' = \dd \sigma = \dd \Sigma$
     \item For any arbitrary location $l' \in \dd \sigma'$ such that $l' \neq l$, $\sigma(l') = \sigma'(l')$.
 
@@ -343,12 +343,8 @@ In order to prove that claim we will induct on the context $E$.
   }
 
   Thus $\Sigma; \Gamma \vdash \sigma'(l) : \tau$ since $\Sigma; \Gamma \vdash v : \tau$. $\Sigma(l) = \tau$ so $\Sigma; \Gamma \vdash \sigma'(l) : \Sigma(l)$
-  \end{enumerate}
-  \end{enumerate}
-\item Other evaluation rules are extended from $\lambda^{\rightarrow}$ so the store $\sigma$ is unchanged.
-
-  $f(
-  \langle e, \sigma \rangle \rightarrow \langle e', \sigma,
-  \Gamma, 
-  \Sigma) \triangleq \Sigma$
-\end{enumerate}\end{enumerate}
+  \end{itemize}
+  \item Claim: $\Sigma;\Gamma \vdash v : \tau$. This follow directly from the proof tree of $\Sigma; \Gamma \vdash l := v : \tau$ above.
+  \end{itemize}
+\end{enumerate}
+\end{enumerate}
