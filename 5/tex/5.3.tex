@@ -14,10 +14,10 @@ The idea is that we first define a variable \texttt{refack} of type $(\ii \right
 \item The same idea can be used to implement the \texttt{rec} $f : \sigma \rightarrow \tau.\lambda x : \sigma.e$ where we first create a variable $rf$ of type $(\sigma \rightarrow \tau)~\ff$ and replace any occurrence of $f$ in $e$ by $!rf$ and assign $e$ to $rf$.
 \item To formalize the type preservation property we will first define a function $f$ to encapsulate how the location context is changed as evaluation rules are applied. 
 
-The idea is for any well-types expression $e$ if $\Sigma; \Gamma \vdash \sigma$ and $f(
+The idea is for any well-typed expression $e$ given $\Sigma$ and $\Gamma$, if $\Sigma; \Gamma \vdash \sigma$ and $f(
   \langle e, \sigma \rangle \rightarrow \langle e', \sigma' \rangle,
   \Gamma, 
-  \Sigma) = \Sigma'$ where then $\Sigma'; \Gamma \vdash \sigma'$. 
+  \Sigma) = \Sigma'$ then $\Sigma'; \Gamma \vdash \sigma'$. 
 
 The function $f$ can be defined inductively based on the proof tree of $\langle e, \sigma \rangle \rightarrow \langle e', \sigma' \rangle$. We define $f$ for each evaluation rule as follows
 \begin{enumerate}[i.]
@@ -75,6 +75,8 @@ The function $f$ can be defined inductively based on the proof tree of $\langle 
   \Sigma) \triangleq \Sigma$
 \end{enumerate}
 
+Notice that the location context is only changed when a new location is inserted into the context domain.
+
 The type preservation property for the extended $\lambda^{\rightarrow}$:
 \begin{align*}
 &\Sigma;\Gamma \vdash e : \tau \\
@@ -96,165 +98,6 @@ We prove the type preservation property above by induction on the proof tree of 
 \begin{enumerate}[i.]
 \item 
   \Rule{}{
-    \langle e, \sigma \rangle \rightarrow \langle e', \sigma' \rangle
-  }{
-    \langle E[e], \sigma \rangle \rightarrow \langle E[e'], \sigma' \rangle
-  }
-
-  Induction hypothesis: If $\Sigma_1, \Gamma_1$ and $\tau_1$ satisfy
-  \begin{align*}
-  &\Sigma_1;\Gamma_1 \vdash e : \tau_1 \\
-  \wedge~&\Sigma_1;\Gamma_1 \vdash \sigma\\
-  \wedge~&\Sigma_1' = f(\langle e, \sigma \rangle \rightarrow \langle e', \sigma' \rangle, \Gamma_1, \Sigma_1)
-  \end{align*}
-then $\Sigma_1';\Gamma_1 \vdash \sigma' \wedge \Sigma_1';\Gamma_1 \vdash e' : \tau_1$
-
-Now suppose there exist $\Sigma, \Gamma$ and $\tau$ such that
-\begin{align*}
-&\Sigma;\Gamma \vdash E[e] : \tau \\
-\wedge~&\Sigma;\Gamma \vdash \sigma\\
-\wedge~&\Sigma' = f(\langle E[e], \sigma \rangle \rightarrow \langle E[e'], \sigma' \rangle, \Gamma, \Sigma)
-\end{align*}
-We will prove that $\Sigma';\Gamma \vdash \sigma' \wedge \Sigma';\Gamma \vdash E[e'] : \tau$.
-
-By definition of $f$, $\Sigma' = f(\langle e, \sigma \rangle \rightarrow \langle e', \sigma' \rangle, \Gamma, \Sigma)$
-
-\begin{itemize}
-\item Claim: $\Sigma';\Gamma \vdash \sigma'$.
-
-Since $E[e]$ is well-typed in $\Sigma; \Gamma$, so is $e$. $\Sigma;\Gamma \vdash \sigma$. By applying the induction hypothesis we obtain the claim directly.
-\item Claim: $\Sigma';\Gamma \vdash E[e'] : \tau$.
-
-Here are the premises that we make use of in this proof.
-\begin{itemize}
-  \item $\Sigma' = f(\langle e, \sigma \rangle \rightarrow \langle e', \sigma' \rangle, \Gamma, \Sigma)$
-  \item $\Sigma;\Gamma \vdash e : \tau_1$ for some type $\tau_1$
-  \item $\Sigma';\Gamma \vdash e' : \tau_1$ 
-  \item $\Sigma;\Gamma \vdash E[e] : \tau$ 
-\end{itemize}
-In order to prove that claim we will induct on the context $E$.
-\begin{itemize}
-  \item $E = [.]$ then $E[e] = e$ and thus $\tau = \tau_1$ since $e$ is well typed. The claim is equivalent to $\Sigma';\Gamma \vdash e' : \tau_1$.
-  \item $E = E_1~e_1$ then $E[e] = E_1[e]~e_1$. 
-
-  The bottom of the proof tree of $\Sigma;\Gamma \vdash E[e] : \tau$ must be \Rule{}{
-    \Sigma;\Gamma \vdash E_1[e] : \tau_1 \rightarrow\tau
-    \qquad
-    \Sigma;\Gamma \vdash e_1 : \tau_1
-  }{
-    \Sigma;\Gamma \vdash E_1[e]~ e_1 : \tau
-  }
-
-  Using the induction hypothesis on $\Sigma;\Gamma \vdash E_1[e] : \tau_1 \rightarrow\tau$ we have $\Sigma';\Gamma \vdash E_1[e'] : \tau_1 \rightarrow\tau$.
-
-  From lemma 2, $\Sigma \subseteq \Sigma'$ and using lemma 1 $\Sigma' ; \Gamma \vdash e_1 : \tau_1$.
-
-  $\Rightarrow$\Rule{}{
-    \Sigma';\Gamma \vdash E_1[e'] : \tau_1 \rightarrow\tau
-    \qquad
-    \Sigma';\Gamma \vdash e_1 : \tau_1
-  }{
-    \Sigma';\Gamma \vdash E_1[e']~ e_1 : \tau
-  }
-  \item $E = v~E_1$ then $E[e] = v~E_1[e]$. 
-
-  The bottom of the proof tree of $\Sigma;\Gamma \vdash E[e] : \tau$ must be \Rule{}{
-    \Sigma;\Gamma \vdash v : \tau_1 \rightarrow\tau
-    \qquad
-    \Sigma;\Gamma \vdash E_1[e] : \tau_1
-  }{
-    \Sigma;\Gamma \vdash v~E_1[e] : \tau
-  }
-
-  Using the induction hypothesis on $\Sigma;\Gamma \vdash E_1[e] : \tau_1$ we have $\Sigma';\Gamma \vdash E_1[e'] : \tau_1$.
-
-  From lemma 2, $\Sigma \subseteq \Sigma'$ and using lemma 1 $\Sigma' ; \Gamma \vdash v : \tau_1 \rightarrow \tau$.
-
-  $\Rightarrow$\Rule{}{
-    \Sigma';\Gamma \vdash v : \tau_1 \rightarrow\tau
-    \qquad
-    \Sigma';\Gamma \vdash E_1[e] : \tau_1
-  }{
-    \Sigma';\Gamma \vdash v~E_1[e'] : \tau
-  }
-  \item $E = \ff~E_1$ then $E[e] = \ff~E_1[e]$ and $\tau = \tau'~\ff$. 
-
-  The bottom of the proof tree of $\Sigma;\Gamma \vdash E[e] : \tau'~\ff$ must be \Rule{}{
-    \Sigma;\Gamma \vdash E_1[e] : \tau'
-  }{
-    \Sigma;\Gamma \vdash \ff~E_1[e] : \tau'~\ff
-    }
-
-  Using the induction hypothesis on $\Sigma;\Gamma \vdash E_1[e] : \tau'$ we have $\Sigma';\Gamma \vdash E_1[e'] : \tau'$.
-
-  $\Rightarrow$\Rule{}{
-    \Sigma';\Gamma \vdash E_1[e] : \tau'
-  }{
-    \Sigma';\Gamma \vdash \ff~E_1[e] : \tau'~\ff
-    }
-  \item $E =~!E_1$then $E[e] = ~!E_1[e]$.
-
-  The bottom of the proof tree of $\Sigma;\Gamma \vdash E[e] : \tau$ must be \Rule{}{
-    \Sigma;\Gamma \vdash E_1[e] : \tau~\ff
-  }{
-    \Sigma;\Gamma \vdash !E_1[e] : \tau
-    }
-
-  Using the induction hypothesis on $\Sigma;\Gamma \vdash E_1[e] : \tau~\ff$ we have $\Sigma';\Gamma \vdash E_1[e] : \tau~\ff$.
-
-  $\Rightarrow$\Rule{}{
-    \Sigma';\Gamma \vdash E_1[e] : \tau~\ff
-  }{
-    \Sigma';\Gamma \vdash !E_1[e] : \tau
-    }
-  \item $E = E_1 := e_1$ then $E[e] = E_1[e] := e_1$. 
-
-  The bottom of the proof tree of $\Sigma;\Gamma \vdash E[e] : \tau$ must be \Rule{}{
-    \Sigma;\Gamma \vdash E_1[e] : \tau~\ff
-    \qquad
-    \Sigma;\Gamma \vdash e_1 : \tau
-  }{
-    \Sigma;\Gamma \vdash E_1[e] := e_1 : \tau
-  }
-
-  Using the induction hypothesis on $\Sigma;\Gamma \vdash E_1[e] : \tau~\ff$ we have $\Sigma';\Gamma \vdash E_1[e] : \tau~\ff$.
-
-  From lemma 2, $\Sigma \subseteq \Sigma'$ and using lemma 1 $\Sigma' ;\Gamma \vdash e_1 : \tau$.
-
-  $\Rightarrow$\Rule{}{
-    \Sigma';\Gamma \vdash E_1[e] : \tau~\ff
-    \qquad
-    \Sigma';\Gamma \vdash e_1 : \tau
-  }{
-    \Sigma';\Gamma \vdash E_1[e] := e_1 : \tau
-  }
-  \item $E = v := E_1$ then $E[e] = v := E_1[e]$. 
-
-  The bottom of the proof tree of $\Sigma;\Gamma \vdash E[e] : \tau$ must be \Rule{}{
-    \Sigma;\Gamma \vdash v : \tau ~ \ff
-    \qquad
-    \Sigma;\Gamma \vdash E_1[e] : \tau
-  }{
-    \Sigma;\Gamma \vdash v := E_1[e] : \tau
-  }
-
-  Using the induction hypothesis on $\Sigma;\Gamma \vdash E_1[e] : \tau$ we have $\Sigma';\Gamma \vdash E_1[e'] : \tau$.
-
-  From lemma 2, $\Sigma \subseteq \Sigma'$ and using lemma 1 $\Sigma' ; \Gamma \vdash v : \tau ~ \ff$.
-
-  $\Rightarrow$\Rule{}{
-    \Sigma';\Gamma \vdash v : \tau ~ \ff
-    \qquad
-    \Sigma';\Gamma \vdash E_1[e] : \tau
-  }{
-    \Sigma';\Gamma \vdash v := E_1[e] : \tau
-  }
-\end{itemize} 
-\end{itemize}
-
-%%TODO: prove the type of E[e']
-\item 
-  \Rule{}{
     l \notin \texttt{dom} ~ \sigma
   }{
     \langle \ff~v, \sigma \rangle \rightarrow \langle l, \sigma[v/l] \rangle
@@ -271,7 +114,8 @@ In order to prove that claim we will induct on the context $E$.
   We will prove that $\Sigma';\Gamma \vdash \sigma' \wedge \Sigma';\Gamma \vdash l : \tau ~\ff$.
 
   Since $\Sigma;\Gamma \vdash \ff~v : \tau~\ff$ the last 2 levels of the proof tree of this derivation must be
-  \Rule{}{
+
+  \Rulec{}{
     \Sigma;\Gamma \vdash v : \tau
   }{
     \Sigma;\Gamma \vdash \ff~v : \tau ~ \ff
@@ -285,11 +129,15 @@ In order to prove that claim we will induct on the context $E$.
     We need to prove that $\dd \Sigma' = \dd \sigma'$ and $\forall l' \in \dd \sigma'.~\Sigma';\Gamma \vdash \sigma'(l') : \Sigma'(l')$.
     \begin{itemize}
     \item $l \notin \dd \sigma \Rightarrow \dd \Sigma' = \dd \Sigma \cup \{l\} = \dd \sigma \cup \{l\} = \dd \sigma'$
-    \item For any location $l' \in \dd \sigma'$ and $l' \neq l$ then $\Sigma; \Gamma \vdash \sigma(l') : \Sigma(l')$. Since $\sigma(l') = \sigma'(l')$ and $\Sigma(l') = \Sigma'(l')$ we have $\Sigma; \Gamma \vdash \sigma'(l') : \Sigma'(l')$. Applying lemma 1 on the expression $\sigma'(l')$, $\Sigma'; \Gamma \vdash \sigma'(l') : \Sigma'(l')$.
+    \item For any location $l' \in \dd \sigma'$ and $l' \neq l$, $l' \in \dd \sigma \Rightarrow \Sigma; \Gamma \vdash \sigma(l') : \Sigma(l')$. 
 
-    On the other hand for the location $l$, $\sigma'(l) = v$ and $\Sigma;\Gamma \vdash v : \tau$. Since $\tau = \Sigma'(l)$ again by lemma 1 $\Sigma';\Gamma \vdash \sigma'(l) : \Sigma'(l)$.
+    Since $\sigma(l') = \sigma'(l')$ and $\Sigma(l') = \Sigma'(l')$ we have $\Sigma; \Gamma \vdash \sigma'(l') : \Sigma'(l')$. Applying lemma 1 on the expression $\sigma'(l')$, $\Sigma'; \Gamma \vdash \sigma'(l') : \Sigma'(l')$.
+
+    On the other hand for the location $l$, $\sigma'(l) = v$ and $\Sigma;\Gamma \vdash v : \tau$.
+
+    $\tau = \Sigma'(l) \Rightarrow \Sigma;\Gamma \vdash \sigma'(l) : \Sigma'(l)$. Again by lemma 1 $\Sigma';\Gamma \vdash \sigma'(l) : \Sigma'(l)$.
     \end{itemize}
-    \item Claim: $\Sigma';\Gamma \vdash l : \tau ~\ff$ which follows directly from $\Sigma'(l) = \tau$.
+    \item Claim: $\Sigma';\Gamma \vdash l : \tau ~\ff$. This follows directly from $\Sigma'(l) = \tau$.
   \end{itemize}
 \item \Rule{}{
   }{
@@ -304,9 +152,19 @@ In order to prove that claim we will induct on the context $E$.
   \end{align*}
   We will prove that $\Sigma';\Gamma \vdash \sigma \wedge \Sigma';\Gamma \vdash \sigma(l) : \tau$ which is equivalent to $\Sigma;\Gamma \vdash \sigma \wedge \Sigma;\Gamma \vdash \sigma(l) : \tau$ since by definition of $f$, $\Sigma' = \Sigma$.
 
-  The first statement is trivial from the assumption.
+  The first statement is from the assumptions.
 
-  $\Sigma;\Gamma \vdash !l : \tau \Leftrightarrow \Sigma;\Gamma \vdash l : \tau ~ \ff \Leftrightarrow \Sigma(l) = \tau$
+  The proof tree of $\Sigma;\Gamma \vdash !l : \tau$ must be
+
+  \Rulec{}{
+  \Rulec{}{
+    \Sigma(l) = \tau
+  }{
+    \Sigma;\Gamma \vdash l : \tau~\ff
+  }
+  }{
+    \Sigma;\Gamma \vdash !l : \tau
+  }
 
   $\Sigma; \Gamma \vdash \sigma \Rightarrow \Sigma;\Gamma \vdash \sigma(l) : \Sigma(l) \Rightarrow \Sigma;\Gamma \vdash \sigma(l) : \tau$
 
@@ -333,18 +191,186 @@ In order to prove that claim we will induct on the context $E$.
 
     On the other hand for the location $l$, $\sigma'(l) = v$. The bottom of the proof tree of $\Sigma; \Gamma \vdash l := v : \tau$ must be:
 
-    \Rule{}{
-    \Rule{}{\Sigma(l) = \tau
+    \Rulec{}{
+    \Rulec{}{\Sigma(l) = \tau
   }{
-    \Sigma;\Gamma \vdash l ; \tau~\ff
-  } \qquad \Sigma;\Gamma \vdash v : \tau
+    \Sigma;\Gamma \vdash l : \tau~\ff
+  } \qquad 
+    \Sigma;\Gamma \vdash v : \tau
     }{
     \Sigma; \Gamma \vdash l := v : \tau
   }
 
-  Thus $\Sigma; \Gamma \vdash \sigma'(l) : \tau$ since $\Sigma; \Gamma \vdash v : \tau$. $\Sigma(l) = \tau$ so $\Sigma; \Gamma \vdash \sigma'(l) : \Sigma(l)$
+  Thus $\Sigma; \Gamma \vdash \sigma'(l) : \tau$ since $\Sigma; \Gamma \vdash v : \tau$. 
+
+  $\Sigma(l) = \tau$ so $\Sigma; \Gamma \vdash \sigma'(l) : \Sigma(l)$
   \end{itemize}
-  \item Claim: $\Sigma;\Gamma \vdash v : \tau$. This follow directly from the proof tree of $\Sigma; \Gamma \vdash l := v : \tau$ above.
+  \item Claim: $\Sigma;\Gamma \vdash v : \tau$. This is from the proof tree of $\Sigma; \Gamma \vdash l := v : \tau$ above.
   \end{itemize}
+\item 
+  \Rule{}{
+    \langle e, \sigma \rangle \rightarrow \langle e', \sigma' \rangle
+  }{
+    \langle E[e], \sigma \rangle \rightarrow \langle E[e'], \sigma' \rangle
+  }
+
+  \textbf{Induction hypothesis}: If $\Sigma_1, \Gamma_1$ and $\tau_1$ satisfy
+  \begin{align*}
+  &\Sigma_1;\Gamma_1 \vdash e : \tau_1 \\
+  \wedge~&\Sigma_1;\Gamma_1 \vdash \sigma\\
+  \wedge~&\Sigma_1' = f(\langle e, \sigma \rangle \rightarrow \langle e', \sigma' \rangle, \Gamma_1, \Sigma_1)
+  \end{align*}
+then $\Sigma_1';\Gamma_1 \vdash \sigma' \wedge \Sigma_1';\Gamma_1 \vdash e' : \tau_1$
+
+Now suppose there exist $\Sigma, \Gamma$ and $\tau$ such that
+\begin{align*}
+&\Sigma;\Gamma \vdash E[e] : \tau \\
+\wedge~&\Sigma;\Gamma \vdash \sigma\\
+\wedge~&\Sigma' = f(\langle E[e], \sigma \rangle \rightarrow \langle E[e'], \sigma' \rangle, \Gamma, \Sigma)
+\end{align*}
+We will prove that $\Sigma';\Gamma \vdash \sigma' \wedge \Sigma';\Gamma \vdash E[e'] : \tau$.
+
+By definition of $f$, $\Sigma' = f(\langle e, \sigma \rangle \rightarrow \langle e', \sigma' \rangle, \Gamma, \Sigma)$
+
+\begin{itemize}
+\item Claim: $\Sigma';\Gamma \vdash \sigma'$.
+
+Since $E[e]$ is well-typed in $\Sigma; \Gamma$, so is $e$. 
+
+Suppose $\Sigma;\Gamma \vdash e : \tau'$. $\Sigma;\Gamma \vdash \sigma$ so applying the induction hypothesis on $\Sigma, \Gamma$ and $\tau'$ we obtain the claim directly.
+\item Claim: $\Sigma';\Gamma \vdash E[e'] : \tau$.
+
+Here are the premises that we make use of in this proof.
+\begin{itemize}
+  \item $\Sigma' = f(\langle e, \sigma \rangle \rightarrow \langle e', \sigma' \rangle, \Gamma, \Sigma)$
+  \item $\Sigma;\Gamma \vdash e : \tau'$ for some type $\tau'$
+  \item $\Sigma';\Gamma \vdash e' : \tau'$ 
+  \item $\Sigma;\Gamma \vdash E[e] : \tau$ 
+\end{itemize}
+In order to prove the claim we induct on the context $E$.
+\begin{itemize}
+  \item Case $E = [.]$ then $E[e] = e$ and thus $\tau = \tau'$ since $e$ is well typed. The claim is equivalent to $\Sigma';\Gamma \vdash e' : \tau'$.
+  \item Case $E = E_1~e_1$ then $E[e] = E_1[e]~e_1$. 
+
+  The bottom of the proof tree of $\Sigma;\Gamma \vdash E[e] : \tau$ must be \Rule{}{
+    \Sigma;\Gamma \vdash E_1[e] : \tau_1 \rightarrow\tau
+    \qquad
+    \Sigma;\Gamma \vdash e_1 : \tau_1
+  }{
+    \Sigma;\Gamma \vdash E_1[e]~ e_1 : \tau
+  }
+
+  Using the induction hypothesis on context $E_1$ and $\Sigma;\Gamma \vdash E_1[e] : \tau_1 \rightarrow\tau$ we have \\
+  $\Sigma';\Gamma \vdash E_1[e'] : \tau_1 \rightarrow\tau$.
+
+  From lemma 2, $\Sigma \subseteq \Sigma'$ and using lemma 1 $\Sigma' ; \Gamma \vdash e_1 : \tau_1$.
+
+  $\Rightarrow$\Rule{}{
+    \Sigma';\Gamma \vdash E_1[e'] : \tau_1 \rightarrow\tau
+    \qquad
+    \Sigma';\Gamma \vdash e_1 : \tau_1
+  }{
+    \Sigma';\Gamma \vdash E_1[e']~ e_1 : \tau
+  }
+  \item Case $E = v~E_1$ then $E[e] = v~E_1[e]$. 
+
+  The bottom of the proof tree of $\Sigma;\Gamma \vdash E[e] : \tau$ must be \Rule{}{
+    \Sigma;\Gamma \vdash v : \tau_1 \rightarrow\tau
+    \qquad
+    \Sigma;\Gamma \vdash E_1[e] : \tau_1
+  }{
+    \Sigma;\Gamma \vdash v~E_1[e] : \tau
+  }
+
+  Using the induction hypothesis on context $E_1$ and $\Sigma;\Gamma \vdash E_1[e] : \tau_1$ \\
+  we have $\Sigma';\Gamma \vdash E_1[e'] : \tau_1$.
+
+  From lemma 2, $\Sigma \subseteq \Sigma'$ and using lemma 1 $\Sigma' ; \Gamma \vdash v : \tau_1 \rightarrow \tau$.
+
+  $\Rightarrow$\Rule{}{
+    \Sigma';\Gamma \vdash v : \tau_1 \rightarrow\tau
+    \qquad
+    \Sigma';\Gamma \vdash E_1[e] : \tau_1
+  }{
+    \Sigma';\Gamma \vdash v~E_1[e'] : \tau
+  }
+  \item Case $E = \ff~E_1$ then $E[e] = \ff~E_1[e]$ and $\tau = \tau'~\ff$. 
+
+  The bottom of the proof tree of $\Sigma;\Gamma \vdash E[e] : \tau'~\ff$ must be \Rule{}{
+    \Sigma;\Gamma \vdash E_1[e] : \tau'
+  }{
+    \Sigma;\Gamma \vdash \ff~E_1[e] : \tau'~\ff
+    }
+
+  Using the induction hypothesis on context $E_1$ and $\Sigma;\Gamma \vdash E_1[e] : \tau'$ \\
+  we have $\Sigma';\Gamma \vdash E_1[e'] : \tau'$.
+
+  $\Rightarrow$\Rule{}{
+    \Sigma';\Gamma \vdash E_1[e] : \tau'
+  }{
+    \Sigma';\Gamma \vdash \ff~E_1[e] : \tau'~\ff
+    }
+  \item Case $E =~!E_1$then $E[e] = ~!E_1[e]$.
+
+  The bottom of the proof tree of $\Sigma;\Gamma \vdash E[e] : \tau$ must be \Rule{}{
+    \Sigma;\Gamma \vdash E_1[e] : \tau~\ff
+  }{
+    \Sigma;\Gamma \vdash !E_1[e] : \tau
+    }
+
+  Using the induction hypothesis on context $E_1$ and $\Sigma;\Gamma \vdash E_1[e] : \tau~\ff$ we have $\Sigma';\Gamma \vdash E_1[e] : \tau~\ff$.
+
+  $\Rightarrow$\Rule{}{
+    \Sigma';\Gamma \vdash E_1[e] : \tau~\ff
+  }{
+    \Sigma';\Gamma \vdash !E_1[e] : \tau
+    }
+  \item Case $E = E_1 := e_1$ then $E[e] = E_1[e] := e_1$. 
+
+  The bottom of the proof tree of $\Sigma;\Gamma \vdash E[e] : \tau$ must be \Rule{}{
+    \Sigma;\Gamma \vdash E_1[e] : \tau~\ff
+    \qquad
+    \Sigma;\Gamma \vdash e_1 : \tau
+  }{
+    \Sigma;\Gamma \vdash E_1[e] := e_1 : \tau
+  }
+
+  Using the induction hypothesis on context $E_1$ and $\Sigma;\Gamma \vdash E_1[e] : \tau~\ff$ we have $\Sigma';\Gamma \vdash E_1[e] : \tau~\ff$.
+
+  From lemma 2, $\Sigma \subseteq \Sigma'$ and using lemma 1 $\Sigma' ;\Gamma \vdash e_1 : \tau$.
+
+  $\Rightarrow$\Rule{}{
+    \Sigma';\Gamma \vdash E_1[e] : \tau~\ff
+    \qquad
+    \Sigma';\Gamma \vdash e_1 : \tau
+  }{
+    \Sigma';\Gamma \vdash E_1[e] := e_1 : \tau
+  }
+  \item Case $E = v := E_1$ then $E[e] = v := E_1[e]$. 
+
+  The bottom of the proof tree of $\Sigma;\Gamma \vdash E[e] : \tau$ must be \Rule{}{
+    \Sigma;\Gamma \vdash v : \tau ~ \ff
+    \qquad
+    \Sigma;\Gamma \vdash E_1[e] : \tau
+  }{
+    \Sigma;\Gamma \vdash v := E_1[e] : \tau
+  }
+
+  Using the induction hypothesison context $E_1$ and $\Sigma;\Gamma \vdash E_1[e] : \tau$ \\
+  we have $\Sigma';\Gamma \vdash E_1[e'] : \tau$.
+
+  From lemma 2, $\Sigma \subseteq \Sigma'$ and using lemma 1 $\Sigma' ; \Gamma \vdash v : \tau ~ \ff$.
+
+  $\Rightarrow$\Rule{}{
+    \Sigma';\Gamma \vdash v : \tau ~ \ff
+    \qquad
+    \Sigma';\Gamma \vdash E_1[e] : \tau
+  }{
+    \Sigma';\Gamma \vdash v := E_1[e] : \tau
+  }
+\end{itemize} 
+\end{itemize}
+
+%%TODO: prove the type of E[e']
 \end{enumerate}
 \end{enumerate}
