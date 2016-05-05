@@ -28,12 +28,13 @@ thing but with the transitivity rule excluded instead of the reflexivity rule.
 
     \end{proof}
 
-    Note that we can essentially re-use this proof to show
+    Note that we can essentially re-use this proof to show \\
 
-    \begin{lemma} If $\subtypeNoTrans{\tau}{\tau}$ then $\algoSubtype{\tau}{\tau}$ \end{lemma}.
+    \begin{lemma} If $\subtypeNoTrans{\tau}{\tau}$ then $\algoSubtype{\tau}{\tau}$ \end{lemma}
 
-    To do so, we'd induct on the structure of $\tau$ and since all three subtyping rules mentioned in the proof also
-    exist in the type system without reflexivity and transivity, the proof also holds here.
+    \begin{proof} By induction on the structure of $\tau$. @ince all three subtyping rules mentioned in the proof
+    above also exist in the type system without reflexivity and transivity, the proof also holds here.
+    \end{proof}
 
 \item
     \begin{lemma} If $\subtype{\tau_1}{\tau_2}$ then $\subtypeNoTrans{\tau_1}{\tau_2}$. \end{lemma}
