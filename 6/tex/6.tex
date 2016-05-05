@@ -7,7 +7,10 @@
 \usepackage{geometry}
 \usepackage{parskip}
 \usepackage{sectsty}
-
+\usepackage{ttquot}
+\usepackage[normalem]{ulem}
+\usepackage{utf8}
+\usepackage{wasysym}
 
 % fancyhdr %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \pagestyle{fancy}
@@ -19,6 +22,9 @@
 \allsectionsfont{\fontsize{12}{15} \sf}
 
 % Macros %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
 
 % Document %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}

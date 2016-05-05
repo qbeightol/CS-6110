@@ -1,1 +1,86 @@
 \section{Algorithmic Subtyping}
+\newcommand{\subtype}[2]{\vdash #1 \leq #2}
+\newcommand{\subtypeNoRefl}[2]{\vdash_\text{\sout{\sf refl}} #1 \leq #2}
+\newcommand{\subtypeNoTrans}[2]{\vdash_\text{\sout{\sf trans}} #1 \leq #2}
+\newcommand{\algoSubtype}[2]{\vdash\hspace{-1.5mm}\RHD #1 \leq #2}
+
+Let $\subtypeNoRefl \sigma \tau$ mean that you can derive $\sigma \leq \tau$
+without using the reflexivity rule, and let $\subtypeNoTrans \sigma \tau$ mean the same
+thing but with the transitivity rule excluded instead of the reflexivity rule.
+
+\begin{enumerate}[(a)]
+\item
+    \begin{lemma} $\forall \tau . \subtypeNoRefl \tau \tau$ \end{lemma}
+    \begin{proof} By induction on the form of $\tau$.
+
+    \underline{$\tau = \top$:} this case follows from the $\subtypeNoRefl \tau \top$
+    rule.
+
+    \underline{$\tau = \tau_1 \rightarrow \tau_2$:} By the induction hypothesis,
+    $\subtypeNoRefl{\tau_1}{\tau_1}$ and $\subtypeNoRefl{\tau_2}{\tau_2}$
+    Applying the subtyping rule for _functions_ then gives
+    $\subtypeNoRefl \tau \tau $.
+
+    \underline{$\tau = \tau_1 \times \tau_2$:} By the induction hypothesis,
+    $\subtypeNoRefl{\tau_1}{\tau_1}$ and $\subtypeNoRefl{\tau_2}{\tau_2}$
+    Applying the subtyping rule for _products_ then gives
+    $\subtypeNoRefl \tau \tau$.
+
+    \end{proof}
+
+    Note that we can essentially re-use this proof to show
+
+    \begin{lemma} If $\subtypeNoTrans{\tau}{\tau}$ then $\algoSubtype{\tau}{\tau}$ \end{lemma}.
+
+    To do so, we'd induct on the structure of $\tau$ and since all three subtyping rules mentioned in the proof also
+    exist in the type system without reflexivity and transivity, the proof also holds here.
+
+\item
+    \begin{lemma} If $\subtype{\tau_1}{\tau_2}$ then $\subtypeNoTrans{\tau_1}{\tau_2}$. \end{lemma}
+
+    \begin{proof} By induction on the derivation of $\subtype{\tau_1}{\tau_2}$. Our induction hypothesis allows us to
+    immediately prove the lemma for all cases of the final rule for deriving $\subtype{\tau_1}{\tau_2}$ except for
+    the transitivity case:
+
+    $$\textsf{TODO: write proof tree for trans case}$$
+
+    % case where $\subtype{\tau_1}{\tau_3}$ and $\subtype{\tau_3}{\tau_2}$.
+    Hence, this proof will focus on that case and do a sub-case analysis on the form of $\tau_1$.
+
+    \underline{$\tau_1 = \top$}. In this case, $\tau_2$ and $\tau_3$ must also be top. There's no way to show that
+    something other than $\top$ is a subtype of $\top$. Instead of using transivity to show that $\tau_1$ is a subtype
+    of $\tau_3$ you could use $\tau \leq \top$ rule directly.
+
+    \underline{$\tau_1 = \tau^\textsf{in}_1 \rightarrow \tau^\textsf{out}_1$:} Here, $\tau_2$ must either be $\top$ or
+    a function type. In the former case it isn't necessary to use transitivity---you can rewrite the proof to use
+    the $\tau \leq \top$ rule instead. If $\tau_2 = \tau^\textsf{in}_2 \rightarrow \tau^\textsf{out}_2$ then
+    $\tau_3 = \tau^\textsf{in}_3 \rightarrow \tau^\textsf{out}_3$. That implies that the derivation is really
+
+    $$\textsf{TODO: write proof tree}$$
+
+    which means that the $\subtypeNoTrans{\tau_1}{\tau_2}$ is derivable without using transivity:
+
+    $$\textsf{TODO: write proof tree}$$
+
+    % Note that by the induction hypothesis, $\subtypeNoTrans{\tau_1}{\tau_2}$
+
+    \underline{$\tau_1 = \tau^\ell_1 \times \tau^r_1$:} Here, $\tau_2$ must either be top or a product type, but
+    as mentioned before, the $\tau_2 = \top$ case can be handled using the $\tau \leq \top$ rule. In the case where
+    $\tau_2 = \tau^\ell_2 \times \tau^r_2$, $\tau_3$ must also be a product. That implies that the derivation has
+    this form
+
+    $$\textsf{TODO: write proof tree}$$
+
+    which can be replaced with
+
+    $$\textsf{TODO: write proof tree}$$
+
+
+    \end{proof}
+\item
+    \begin{theorem} If $\subtype{\tau_1}{\tau_2}$ then $\algoSubtype{\tau_1}{\tau_2}$. \end{theorem}
+    \begin{proof} By our lemmas, $\subtype{\tau_1}{\tau_2}$ implies $\subtypeNoTrans{\tau_1}{\tau_2}$ and
+    $\subtypeNoTrans{\tau_1}{\tau_2}$ imples $\algoSubtype{\tau_1}{\tau_2}$. Hence $\subtype{\tau_1}{\tau_2}$
+    implies $\algoSubtype{\tau_1}{\tau_2}$
+    \end{proof}
+\end{enumerate}
