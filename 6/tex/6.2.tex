@@ -2,7 +2,8 @@
 \newcommand{\subtype}[2]{\vdash #1 \leq #2}
 \newcommand{\subtypeNoRefl}[2]{\vdash_\text{\sout{\sf refl}} #1 \leq #2}
 \newcommand{\subtypeNoTrans}[2]{\vdash_\text{\sout{\sf trans}} #1 \leq #2}
-\newcommand{\algoSubtype}[2]{\vdash\hspace{-1.5mm}\RHD #1 \leq #2}
+\newcommand{\asub}{\ensuremath{\vdash\!\!\!\!\raisebox{-.6ex}{\tikz\node[rotate=90]{\footnotesize$\blacktriangledown$};}}}
+\newcommand{\algoSubtype}[2]{\asub #1 \leq #2}
 
 Let $\subtypeNoRefl \sigma \tau$ mean that you can derive $\sigma \leq \tau$
 without using the reflexivity rule, and let $\subtypeNoTrans \sigma \tau$ mean the same
@@ -32,15 +33,15 @@ thing but with the transitivity rule excluded instead of the reflexivity rule.
 
     \begin{lemma} If $\subtypeNoTrans{\tau}{\tau}$ then $\algoSubtype{\tau}{\tau}$ \end{lemma}
 
-    \begin{proof} By induction on the structure of $\tau$. @ince all three subtyping rules mentioned in the proof
+    \begin{proof} By induction on the structure of $\tau$. Since all three subtyping rules mentioned in the proof
     above also exist in the type system without reflexivity and transivity, the proof also holds here.
     \end{proof}
 
 \item
     \begin{lemma} If $\subtype{\tau_1}{\tau_2}$ then $\subtypeNoTrans{\tau_1}{\tau_2}$. \end{lemma}
 
-    \begin{proof} We'll use well founded inductino on the set of all derivations of $\subtype{\tau_1}{\tau_2}$ where
-    $D \prec E$ when $D$ is a subtyping judgment whose height is less than the height of $E$. Our induction hypothesis
+    \begin{proof} We'll use well founded induction on the set of all derivations of $\subtype{\tau_1}{\tau_2}$ where
+    $D \prec E$ when $D$ is a subtyping derivation whose height is less than the height of $E$. Our induction hypothesis
     allows us to immediately prove the lemma for all cases of the final rule for deriving $\subtype{\tau_1}{\tau_2}$
     except for the transitivity case:
 
