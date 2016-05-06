@@ -13,8 +13,8 @@
     \item These new rules break progress---terms like $\textsf{outleft} (\textsf{inR}~a)$ get stuck. These rules
     shouldn't break preservation, however. If an $\textsf{outleft}$ or $\textsf{outright}$ term mangages to step, the
     resulting term will have the correct type.
-    \item Adding a rule like $P \wedge Q \Rightarrow P$ would be unsound in propositional logic. You could use that rule
-    along with $P \Rightarrow P \wedge Q$ to show that any proposition was true if you knew some other true
+    \item Adding a rule like $P \vee Q \Rightarrow P$ would be unsound in propositional logic. You could use that rule
+    along with $P \Rightarrow P \vee Q$ to show that any proposition was true if you knew some other true
     proposition---and therefore you could prove propositions true that were also provably false. Your logic could easily
     be inconsistent.
 \end{enumerate}
