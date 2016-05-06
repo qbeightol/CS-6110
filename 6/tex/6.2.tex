@@ -39,11 +39,12 @@ thing but with the transitivity rule excluded instead of the reflexivity rule.
 \item
     \begin{lemma} If $\subtype{\tau_1}{\tau_2}$ then $\subtypeNoTrans{\tau_1}{\tau_2}$. \end{lemma}
 
-    \begin{proof} By induction on the derivation of $\subtype{\tau_1}{\tau_2}$. Our induction hypothesis allows us to
-    immediately prove the lemma for all cases of the final rule for deriving $\subtype{\tau_1}{\tau_2}$ except for
-    the transitivity case:
+    \begin{proof} We'll use well founded inductino on the set of all derivations of $\subtype{\tau_1}{\tau_2}$ where
+    $D \prec E$ when $D$ is a subtyping judgment whose height is less than the height of $E$. Our induction hypothesis
+    allows us to immediately prove the lemma for all cases of the final rule for deriving $\subtype{\tau_1}{\tau_2}$
+    except for the transitivity case:
 
-    $$\textsf{TODO: write proof tree for trans case}$$
+    $$\inferrule{\subtype{\tau_1}{\tau_3} \\ \subtype{\tau_3}{\tau_2}}{\subtype{\tau_1}{\tau_2}}$$
 
     % case where $\subtype{\tau_1}{\tau_3}$ and $\subtype{\tau_3}{\tau_2}$.
     Hence, this proof will focus on that case and do a sub-case analysis on the form of $\tau_1$.
@@ -57,11 +58,58 @@ thing but with the transitivity rule excluded instead of the reflexivity rule.
     the $\tau \leq \top$ rule instead. If $\tau_2 = \tau^\textsf{in}_2 \rightarrow \tau^\textsf{out}_2$ then
     $\tau_3 = \tau^\textsf{in}_3 \rightarrow \tau^\textsf{out}_3$. That implies that the derivation is really
 
-    $$\textsf{TODO: write proof tree}$$
+    \newcommand{\leftSubtree}{
+        \inferrule{
+            \subtype{\tau^\textsf{in}_3}{\tau^\textsf{in}_1} \\
+            \subtype{\tau^\textsf{out}_1}{\tau^\textsf{out}_3}
+        }{
+            \subtype{\tau^\textsf{in}_1 \rightarrow \tau^\textsf{out}_1}{\tau^\textsf{in}_3 \rightarrow \tau^\textsf{out}_3}
+        }
+    }
 
-    which means that the $\subtypeNoTrans{\tau_1}{\tau_2}$ is derivable without using transivity:
+    \newcommand{\rightSubtree}{
+        \inferrule{
+            \subtype{\tau^\textsf{in}_2}{\tau^\textsf{in}_3} \\
+            \subtype{\tau^\textsf{out}_3}{\tau^\textsf{out}_2}
+        }{
+            \subtype{\tau^\textsf{in}_3 \rightarrow \tau^\textsf{out}_3}{\tau^\textsf{in}_2 \rightarrow \tau^\textsf{out}_2}
+        }
+    }
 
-    $$\textsf{TODO: write proof tree}$$
+    \newcommand{\base}{
+        \subtype{\tau^\textsf{in}_1 \rightarrow \tau^\textsf{out}_1}{\tau^\textsf{in}_2 \rightarrow \tau^\textsf{out}_2}
+    }
+
+    $$\inferrule{\leftSubtree \\ \rightSubtree}{\base}$$
+
+    Note that we could use our assumptions to build the following derivation:
+
+    $$
+    \inferrule{
+        \subtype{\tau^\textsf{in}_3}{\tau^\textsf{in}_1} \\
+        \subtype{\tau^\textsf{in}_2}{\tau^\textsf{in}_3}
+    }{
+        \subtype{\tau^\textsf{in}_2}{\tau^\textsf{in}_1} \\
+    }
+    $$
+
+    along with a similar derivation for $\subtype{\tau^\textsf{out}_1}{\tau^\textsf{out}_2}$. Since these derivations
+    have a smaller height than the derivation of $\subtype{\tau_1}{\tau_2}$, we can apply our inductive hypothesis to
+    conclude
+
+    $$\subtypeNoTrans{\tau^\textsf{in}_2}{\tau^\textsf{in}_1}$$
+    $$\subtypeNoTrans{\tau^\textsf{out}_1}{\tau^\textsf{out}_2}$$
+
+    Therefore, $\subtypeNoTrans{\tau_1}{\tau_2}$ is derivable without using transivity:
+
+    $$
+    \inferrule{
+        \subtypeNoTrans{\tau^\textsf{in}_2}{\tau^\textsf{in}_1}
+        \subtypeNoTrans{\tau^\textsf{out}_1}{\tau^\textsf{out}_2}
+    }{
+        \subtypeNoTrans{\tau^\textsf{in}_1 \rightarrow \tau^\textsf{out}_1}{\tau^\textsf{in}_2 \rightarrow \tau^\textsf{out}_2}
+    }
+    $$
 
     % Note that by the induction hypothesis, $\subtypeNoTrans{\tau_1}{\tau_2}$
 
@@ -70,11 +118,43 @@ thing but with the transitivity rule excluded instead of the reflexivity rule.
     $\tau_2 = \tau^\ell_2 \times \tau^r_2$, $\tau_3$ must also be a product. That implies that the derivation has
     this form
 
-    $$\textsf{TODO: write proof tree}$$
+    \renewcommand{\leftSubtree}{
+        \inferrule{
+            \subtype{\tau^\ell_1}{\tau^\ell_3} \\
+            \subtype{\tau^r_1}{\tau^r_3}
+        }{
+            \subtype{\tau^\ell_1 \times \tau^r_1}{\tau^\ell_3 \times \tau^r_3}
+        }
+    }
 
-    which can be replaced with
+    \renewcommand{\rightSubtree}{
+        \inferrule{
+            \subtype{\tau^\ell_3}{\tau^\ell_2} \\
+            \subtype{\tau^r_3}{\tau^r_2}
+        }{
+            \subtype{\tau^\ell_3 \times \tau^r_3}{\tau^\ell_2 \times \tau^r_2}
+        }
+    }
 
-    $$\textsf{TODO: write proof tree}$$
+    \renewcommand{\base}{
+        \subtype{\tau^\ell_1 \times \tau^r_1}{\tau^\ell_2 \times \tau^r_2}
+    }
+
+    $$\inferrule{\leftSubtree \\ \rightSubtree}{\base}$$
+
+    We can use the sub-derivations in our tree to build derivations for $\subtype{\tau^\ell_1}{\tau^\ell_2}$
+    and $\subtype{\tau^r_1}{\tau^r_2}$. Then we can apply the IH to these derivations to conclude
+    $\subtypeNoTrans{\tau^\ell_1}{\tau^\ell_2}$ and $\subtypeNoTrans{\tau^r_1}{\tau^r_2}$. Finally, we can derive
+    the desired result:
+
+    $$
+    \inferrule{
+        \subtypeNoTrans{\tau^\ell_1}{\tau^\ell_2}
+        \subtypeNoTrans{\tau^r_1}{\tau^r_2}
+    }{
+        \subtypeNoTrans{\tau^\ell_1 \times \tau^r_2}{\tau^\ell_2 \times \tau^r_2}
+    }
+    $$
 
     \end{proof}
 \item
