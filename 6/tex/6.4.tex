@@ -1,1 +1,24 @@
 \section{Encoding Sums as Products}
+\begin{enumerate}[(a)]
+  \item
+  Recall that the type $\forall\alpha.\alpha$ is uninhabited so we can use this as the type void that represents False.
+  \begin{align*}
+  \phi \vee \psi &\equiv \neg (\neg \phi \wedge \neg \psi)\\
+                 &\equiv ((\phi \rightarrow \perp) \times (\psi \rightarrow \perp)) \rightarrow \perp\\
+                 &\equiv ((\phi \rightarrow \forall \alpha.\alpha) \times (\psi \rightarrow \forall ~\alpha.\alpha)) \rightarrow \forall \alpha.\alpha\\
+  \end{align*}
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+   \item
+   \begin{align*}
+    \T {\texttt{unit}} &\triangleq \texttt{unit}\\
+    \T {\tau_1 \rightarrow \tau_2} &\triangleq \T {\tau_1} \rightarrow \T {\tau_2}\\
+    \T {\tau_1 + \tau_2} &\triangleq \forall\alpha.((\T {\tau_1} \rightarrow \alpha) \times (\T {\tau_2} \rightarrow \alpha)) \rightarrow \alpha
+   \end{align*}
+   \item
+   \begin{align*}
+    \E {\texttt{inL}_{\tau_1 + \tau_2}e} &\triangleq \Lambda \alpha.\lambda f : ((\T {\tau_1} \rightarrow \alpha) \times (\T {\tau_2} \rightarrow \alpha)). ((\#1~f)~\E{e})\\
+    \E {\texttt{inR}_{\tau_1 + \tau_2}e} &\triangleq \Lambda \alpha.\lambda f : ((\T {\tau_1} \rightarrow \alpha) \times (\T {\tau_2} \rightarrow \alpha)). ((\#2~f)~\E{e})\\
+    \E {\texttt{case $e_0$ of $e_1$|$e_2$}} &\triangleq \E {e_0}~\T {\beta}~(\E{e_1}, \E{e_2}) \\
+    &\texttt{where $e_1$ and $e_2$ both map into type $\beta$}
+   \end{align*}
+\end{enumerate}
