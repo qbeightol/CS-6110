@@ -1,1 +1,24 @@
 \section{Recursive Types}
+\begin{enumerate}[(a)]
+\item The equation types for \even and \odd are as follow:
+  \begin{align*}
+  \even &= \unit + \odd\\
+  \odd &= \even\\
+  \Rightarrow \even &= \mu~\even. (\unit + \odd) \{\mu~\odd.\even/\odd\}\\
+  &= \mu~\even. (\unit + \mu~\odd. \even)\\
+  &= \mu~\even.(\unit + \even)\\
+  \odd &= \mu~\odd.(\even \{\mu~\even .(\unit + \odd) / \even\})\\
+  &= \mu~\odd. \mu~\even. (\unit + \odd)\\
+  &= \mu~\odd.(\unit + \odd)
+  \end{align*}
+\item
+\begin{align*}
+  \texttt{unfold }\even &= (\unit + \even) \{\mu~\even.(\unit + \even)  / \even\}\\
+  &= \unit + \mu~\even.(\unit + \even)\\
+  &= \unit + \mu~\odd.(\unit + \odd) \texttt{ ($\alpha$-equivalence)}\\
+  &= \unit + \odd\\
+  \odd &=  \mu~\odd.(\unit + \odd)\\
+  &= \mu~\even.(\unit + \even)\texttt{ ($\alpha$-equivalence)}\\
+  &= \even~\Box
+  \end{align*}
+\end{enumerate}

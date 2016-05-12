@@ -2,11 +2,16 @@
 \begin{enumerate}[(a)]
   \item
   Recall that the type $\forall\alpha.\alpha$ is uninhabited so we can use this as the type void that represents False.
-  \begin{align*}
-  \phi \vee \psi &\equiv \neg (\neg \phi \wedge \neg \psi)\\
-                 &\equiv ((\phi \rightarrow \perp) \times (\psi \rightarrow \perp)) \rightarrow \perp\\
-                 &\equiv ((\phi \rightarrow \forall \alpha.\alpha) \times (\psi \rightarrow \forall ~\alpha.\alpha)) \rightarrow \forall \alpha.\alpha\\
-  \end{align*}
+
+  We claim that $\phi \vee \psi \equiv \forall \alpha.(((\phi \rightarrow \alpha) \times (\psi \rightarrow \alpha)) \rightarrow \alpha)$.
+
+  $((\phi \rightarrow \alpha) \times (\psi \rightarrow \alpha)) \rightarrow \alpha$ is true if and only if either $\phi, \psi$ or $\alpha$ is true. Since this has to hold for all $\alpha$, the proposition $\forall \alpha.(((\phi \rightarrow \alpha) \times (\psi \rightarrow \alpha)) \rightarrow \alpha)$ is true if and only if either $\phi$ or $\psi$ is true. 
+
+  % \begin{align*}
+  % \phi \vee \psi &\equiv \neg (\neg \phi \wedge \neg \psi)\\
+  %                &\equiv ((\phi \rightarrow \perp) \times (\psi \rightarrow \perp)) \rightarrow \perp\\
+  %                &\equiv ((\phi \rightarrow \forall \alpha.\alpha) \times (\psi \rightarrow \forall ~\alpha.\alpha)) \rightarrow \forall \alpha.\alpha\\
+  % \end{align*}
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    \item
    \begin{align*}
